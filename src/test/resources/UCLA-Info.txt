@@ -1,0 +1,4 @@
+    genericClient.setPort(8088);
+    genericClient.setHost("lspsplkap06");
+    genericClient.setAuthorizationToken("902ADE3D-2895-47F0-ABE6-4981DB2ABE9C");
+    genericClient.disableCertificateValidation();
