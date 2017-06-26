@@ -166,7 +166,7 @@ public interface EventBuilder<E> {
   Map<String, Object> getFields();
 
   /**
-   * Set the map of additional field names and values that will be used on the
+   * Set the map of field names and values that will be used on the
    * next invocation of the build() method.
    *
    * <p>NOTE:  Additional indexed fields are only supported on Splunk 6.5 or
@@ -189,6 +189,31 @@ public interface EventBuilder<E> {
    * @param fieldValues the value(s) of the indexed field
    */
   void setField(String fieldName, String... fieldValues);
+
+  /**
+   * Add the map of additional field names and values that will be used on the
+   * next invocation of the build() method.
+   *
+   * <p>NOTE:  Additional indexed fields are only supported on Splunk 6.5 or
+   * greater, and INDEXED_EXTRACTION must be set to JSON for the sourcetype
+   * in props.conf.
+   *
+   * @param fieldMap the map of field names and values
+   */
+  void addFields(Map<String, Object> fieldMap);
+
+  /**
+   * Add the value of a indexed field that will be used on the next invocation
+   * of the build() method.
+   *
+   * <p>NOTE:  Additional indexed Fields are only supported on Splunk 6.5 or
+   * greater, and INDEXED_EXTRACTION must be set to JSON for the sourcetype
+   * in props.conf.
+   *
+   * @param fieldName   the name of the indexed field.
+   * @param fieldValues the value(s) of the indexed field
+   */
+  void addField(String fieldName, String... fieldValues);
 
   /**
    * Clear the map of additional fields that will be used on the next

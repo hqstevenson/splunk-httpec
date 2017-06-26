@@ -237,7 +237,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
   public void setFields(final Map<String, Object> fieldMap) {
     clearFields();
 
-    getFields().putAll(fieldMap);
+    addFields(fieldMap);
   }
 
   /**
@@ -253,6 +253,73 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
    */
   @Override
   public void setField(final String fieldName, final String... fieldValues) {
+    getFields();
+
+    if (fieldName == null) {
+      log.warn("Null field name - ignoring value(s): {}", fieldValues);
+    } else if (fieldName.isEmpty()) {
+      log.warn("Empty field name - ignoring value(s): {}", fieldValues);
+    } else {
+      if (fieldValues == null) {
+        fields.remove(fieldName);
+      } else {
+        switch (fieldValues.length) {
+          case 0:
+            // Remove the empty field
+            fields.remove(fieldName);
+            break;
+          case 1:
+            if (fieldValues[0] == null || fieldValues[0].isEmpty()) {
+              fields.remove(fieldName);
+            } else {
+              // Add a single String
+              fields.put(fieldName, fieldValues[0]);
+            }
+            break;
+          default:
+            // Add all values
+            fields.put(fieldName, Arrays.asList(fieldValues));
+        }
+      }
+    }
+  }
+
+  /**
+   * Add the map of additional field names and values that will be used on the
+   * next invocation of the build() method.
+   *
+   * <p>NOTE:  Additional indexed fields are only supported on Splunk 6.5 or
+   * greater, and INDEXED_EXTRACTION must be set to JSON for the sourcetype
+   * in props.conf.
+   *
+   * @param fieldMap the map of field names and values
+   */
+  @Override
+  public void addFields(final Map<String, Object> fieldMap) {
+    if (fieldMap != null &&  !fieldMap.isEmpty()) {
+      Map<String, Object> currentFields = getFields();
+      for (Map.Entry<String, Object> entry : fieldMap.entrySet()) {
+        Object entryValue = entry.getValue();
+        if (entryValue != null) {
+          currentFields.put(entry.getKey(), entryValue);
+        }
+      }
+    }
+  }
+
+  /**
+   * ADD the value of a indexed field that will be used on the next invocation
+   * of the build() method.
+   *
+   * <p>NOTE:  Additional indexed Fields are only supported on Splunk 6.5 or
+   * greater, and INDEXED_EXTRACTION must be set to JSON for the sourcetype
+   * in props.conf.
+   *
+   * @param fieldName   the name of the indexed field.
+   * @param fieldValues the value(s) of the indexed field
+   */
+  @Override
+  public void addField(final String fieldName, final String... fieldValues) {
     getFields();
 
     if (fieldName == null) {

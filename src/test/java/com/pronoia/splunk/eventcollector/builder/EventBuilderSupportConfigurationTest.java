@@ -162,7 +162,8 @@ public class EventBuilderSupportConfigurationTest {
    */
   @Test
   public void testSetFields() throws Exception {
-    final Map<String, Object> expected = new HashMap<>();
+    Map<String, Object> expected = new HashMap<>();
+    expected.put("myField", "myValue");
 
     assertNull("Fields map should be null on creation", instance.fields);
     instance.setFields(expected);
