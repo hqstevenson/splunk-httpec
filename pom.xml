@@ -23,7 +23,7 @@
     <groupId>com.pronoia.splunk</groupId>
     <artifactId>splunk.httpec</artifactId>
     <packaging>bundle</packaging>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.1</version>
 
     <name>Splunk HTTP Event Collector Support</name>
 
@@ -129,5 +129,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
