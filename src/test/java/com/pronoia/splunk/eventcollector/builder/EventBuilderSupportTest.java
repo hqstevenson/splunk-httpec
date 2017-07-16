@@ -23,6 +23,9 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Test JSON serialization for the EventBuilderSupport class.
  */
@@ -306,4 +309,13 @@ public class EventBuilderSupportTest {
     assertEquals(expected, instance.build());
   }
 
+  //@Test
+  /*public void testEventBuilderWithJackson throws Exception{
+
+    JSONObject:{"host":"machine41k","sourcetype":"jmx-attributes","source":"java.lang:type=Threading","time":"1499951810.069","fields":{"type":"Threading"},"event":{"ThreadAllocatedMemorySupported":"true","ThreadContentionMonitoringEnabled":"false","TotalStartedThreadCount":"8","CurrentThreadCpuTimeSupported":"true","CurrentThreadUserTime":"0","PeakThreadCount":"7","AllThreadIds":"[J@600204d5","ThreadAllocatedMemoryEnabled":"true","CurrentThreadCpuTime":"2597820","ObjectName":"java.lang:type=Threading","ThreadContentionMonitoringSupported":"true","ThreadCpuTimeSupported":"true","ThreadCount":"7","ThreadCpuTimeEnabled":"true","ObjectMonitorUsageSupported":"true","SynchronizerUsageSupported":"true","DaemonThreadCount":"5"}}
+     */
+    /*instance.clearFields();
+    Map<?,?> fields=new HashMap<>();
+    fields.put("")*/
+  //}
 }

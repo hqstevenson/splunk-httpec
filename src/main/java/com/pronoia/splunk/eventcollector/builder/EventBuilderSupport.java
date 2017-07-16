@@ -25,13 +25,13 @@ import static com.pronoia.splunk.eventcollector.EventCollectorInfo.SOURCETYPE_KE
 import static com.pronoia.splunk.eventcollector.EventCollectorInfo.SOURCE_KEY;
 import static com.pronoia.splunk.eventcollector.EventCollectorInfo.TIMESTAMP_KEY;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pronoia.splunk.eventcollector.EventBuilder;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +49,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
   String sourcetype;
   String index;
 
-  // Other system properties, if present
+  // Other system properties, if what dpresent
   String karafName;
 
   Map<String, Object> fields;
@@ -441,13 +441,20 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
    */
   @Override
   public String build() {
-    JSONObject jsonObject = new JSONObject();
-
-    serializeFields(jsonObject);
-    serializeBody(jsonObject);
-
-    return jsonObject.toJSONString();
+    Map<String,Object> mapObject=new HashMap<>();
+    serializeFields(mapObject);
+    serializeBody(mapObject);
+    ObjectMapper objectMapper=new ObjectMapper();
+    String jsonString="{}";
+    try {
+      jsonString=objectMapper.writeValueAsString(mapObject);
+      log.debug("JSON:{}",jsonString);
+    }catch(Exception e){
+      log.error("FATAL! Can't write json to string:{}",e);
+    }
+    return jsonString;
   }
+
 
   /**
    * If the Karaf container is detected, get it's name.
@@ -474,7 +481,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
    *
    * @param eventObject the target JSON object for the field values
    */
-  protected void serializeFields(JSONObject eventObject) {
+  protected void serializeFields(Map eventObject) {
     putIfValueIsNotNull(eventObject, HOST_KEY, host);
     putIfValueIsNotNull(eventObject, SOURCE_KEY, source);
     putIfValueIsNotNull(eventObject, SOURCETYPE_KEY, sourcetype);
@@ -496,8 +503,10 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
    *
    * @param eventObject the target JSON object for the body
    */
-  protected void serializeBody(JSONObject eventObject) {
+  protected void serializeBody(Map eventObject) {
+    log.debug("loading eventBody!");
     eventObject.put(EVENT_BODY_KEY, eventBody);
+
   }
 
   /**
@@ -510,7 +519,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
    * @param key        the 'key' of the value
    * @param value      the value itself
    */
-  protected void putIfValueIsNotNull(JSONObject jsonObject,
+  protected void putIfValueIsNotNull(Map jsonObject,
                                      final String key, final String value) {
     if (jsonObject == null) {
       log.error("Null JSONObject - ignoring {} = {}", key, value);
