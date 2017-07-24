@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <E> the type of the event body
  */
+@Deprecated
 public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
   protected Logger log = LoggerFactory.getLogger(this.getClass());
 
