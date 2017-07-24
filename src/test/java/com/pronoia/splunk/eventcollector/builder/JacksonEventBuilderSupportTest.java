@@ -26,12 +26,12 @@ import org.junit.Test;
 /**
  * Test JSON serialization for the EventBuilderSupport class.
  */
-public class EventBuilderSupportTest {
-  EventBuilderSupport<String> instance;
+public class JacksonEventBuilderSupportTest {
+  JacksonEventBuilderSupport<Object> instance;
 
   @Before
   public void setUp() throws Exception {
-    instance = new EventBuilderSupport<String>() {
+    instance = new JacksonEventBuilderSupport<Object>() {
     };
   }
 

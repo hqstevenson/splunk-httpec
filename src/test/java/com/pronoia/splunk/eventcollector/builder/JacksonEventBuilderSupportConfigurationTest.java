@@ -31,12 +31,12 @@ import org.junit.Test;
 /**
  * Test the configuration methods of the EventBuilderSupport class.
  */
-public class EventBuilderSupportConfigurationTest {
-  EventBuilderSupport<String> instance;
+public class JacksonEventBuilderSupportConfigurationTest {
+  JacksonEventBuilderSupport<String> instance;
 
   @Before
   public void setUp() throws Exception {
-    instance = new EventBuilderSupport<String>() {
+    instance = new JacksonEventBuilderSupport<String>() {
     };
   }
 

@@ -20,5 +20,5 @@ package com.pronoia.splunk.eventcollector.builder;
 /**
  * Simple implementation for using a String as the event body.
  */
-public class StringEventBuilder extends EventBuilderSupport<String> {
+public class StringEventBuilder extends JacksonEventBuilderSupport<String> {
 }

@@ -340,7 +340,7 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
    * @return the current EventBuilder
    */
   @Override
-  public JacksonEventBuilderSupport clearFields() {
+  public JacksonEventBuilderSupport<E> clearFields() {
     if (this.fields != null) {
       this.fields.clear();
     }
@@ -427,7 +427,7 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
       jsonString = objectMapper.writeValueAsString(mapObject);
       log.debug("JSON:{}", jsonString);
     } catch (Exception e) {
-      log.error("FATAL! Can't write json to string:{}", e);
+      log.error("FATAL! Can't write JSON String", e);
     }
     return jsonString;
   }
@@ -458,7 +458,9 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
    *
    * @param eventObject the target eventObject for the field values
    */
-  protected void serializeFields(Map eventObject) {
+  protected void serializeFields(Map<String, Object> eventObject) {
+    log.debug("Serializing event fields");
+
     putIfValueIsNotNull(eventObject, HOST_KEY, host);
     putIfValueIsNotNull(eventObject, SOURCE_KEY, source);
     putIfValueIsNotNull(eventObject, SOURCETYPE_KEY, sourcetype);
@@ -478,12 +480,11 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
    *
    * <p>This method is called by the 'build' method.
    *
-   * @param eventObject the target eventObject Map<String,Object> for the body
+   * @param eventObject the target eventObject Map&lt;String,Object&gt; for the body
    */
-  protected void serializeBody(Map eventObject) {
-    log.debug("loading eventBody!");
+  protected void serializeBody(Map<String, Object> eventObject) {
+    log.debug("Serializing event body");
     eventObject.put(EVENT_BODY_KEY, eventBody);
-
   }
 
   /**
@@ -495,7 +496,7 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
    * @param key         the 'key' of the value
    * @param value       the value itself
    */
-  protected void putIfValueIsNotNull(Map eventObject,
+  protected void putIfValueIsNotNull(Map<String, Object> eventObject,
                                      final String key, final String value) {
     if (eventObject == null) {
       log.error("Null eventObject Map - ignoring {} = {}", key, value);

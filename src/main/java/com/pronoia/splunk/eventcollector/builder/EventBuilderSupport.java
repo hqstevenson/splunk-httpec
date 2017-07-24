@@ -359,7 +359,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
    * @return the current EventBuilder
    */
   @Override
-  public EventBuilderSupport clearFields() {
+  public EventBuilderSupport<E> clearFields() {
     if (this.fields != null) {
       this.fields.clear();
     }
