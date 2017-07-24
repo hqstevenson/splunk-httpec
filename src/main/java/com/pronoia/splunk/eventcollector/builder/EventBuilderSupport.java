@@ -297,7 +297,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
    */
   @Override
   public void addFields(final Map<String, Object> fieldMap) {
-    if (fieldMap != null &&  !fieldMap.isEmpty()) {
+    if (fieldMap != null && !fieldMap.isEmpty()) {
       Map<String, Object> currentFields = getFields();
       for (Map.Entry<String, Object> entry : fieldMap.entrySet()) {
         Object entryValue = entry.getValue();

@@ -239,6 +239,16 @@ public interface EventBuilder<E> {
   Double getTimestamp();
 
   /**
+   * Set the value for the Splunk 'timestamp' default field that will be used
+   * on the next invocation of the build() method.
+   *
+   * <p>This value is typically the time at which the event occurred.
+   *
+   * @param epochSeconds value for the 'timestamp' default field as the number of seconds since 1/1/1970 GMT.
+   */
+  void setTimestamp(double epochSeconds);
+
+  /**
    * Set the value for the Splunk 'timestamp' default field that will be used on
    * the next invocation of the build() method.
    *
@@ -265,16 +275,6 @@ public interface EventBuilder<E> {
 
     this.setTimestamp(date.getTime() / millisecondsPerSecond);
   }
-
-  /**
-   * Set the value for the Splunk 'timestamp' default field that will be used
-   * on the next invocation of the build() method.
-   *
-   * <p>This value is typically the time at which the event occurred.
-   *
-   * @param epochSeconds value for the 'timestamp' default field as the number of seconds since 1/1/1970 GMT.
-   */
-  void setTimestamp(double epochSeconds);
 
   /**
    * Set the value for the Splunk 'timestamp' default field that will be used on
