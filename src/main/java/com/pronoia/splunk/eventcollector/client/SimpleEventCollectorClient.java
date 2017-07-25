@@ -249,10 +249,10 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
       }
       if (response.getStatusLine().getStatusCode() != 200) {
         log.error("Post failed with response {} for payload {}", response, event);
-        throw new EventDeliveryException(response.toString());
+        throw new EventDeliveryException(event, response.toString());
       }
     } catch (IOException ioEx) {
-      throw new EventDeliveryException(ioEx);
+      throw new EventDeliveryException(event, ioEx);
     }
   }
 

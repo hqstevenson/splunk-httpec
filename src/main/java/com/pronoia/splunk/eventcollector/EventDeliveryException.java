@@ -22,18 +22,24 @@ package com.pronoia.splunk.eventcollector;
  * HTTP Event Collector.
  */
 public class EventDeliveryException extends Exception {
-  public EventDeliveryException() {
-  }
+  final String event;
 
-  public EventDeliveryException(final String message) {
+  public EventDeliveryException(final String event, final String message) {
     super(message);
+    this.event = event;
   }
 
-  public EventDeliveryException(final String message, final Throwable cause) {
+  public EventDeliveryException(final String event, final String message, final Throwable cause) {
     super(message, cause);
+    this.event = event;
   }
 
-  public EventDeliveryException(final Throwable cause) {
+  public EventDeliveryException(final String event, final Throwable cause) {
     super(cause);
+    this.event = event;
+  }
+
+  public String getEvent() {
+    return event;
   }
 }
