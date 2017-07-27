@@ -524,4 +524,12 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     }
   }
 
+  protected void copyConfiguration(EventBuilderSupport<E> sourceEventBuilder) {
+    this.timestamp = sourceEventBuilder.timestamp;
+    this.host = sourceEventBuilder.host;
+    this.source = sourceEventBuilder.source;
+    this.sourcetype = sourceEventBuilder.sourcetype;
+    this.index = sourceEventBuilder.index;
+  }
+
 }

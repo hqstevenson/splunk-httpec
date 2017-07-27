@@ -1,21 +1,17 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+ * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+ * to You under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 
-package com.pronoia.splunk.eventcollector.builder;
+package com.pronoia.splunk.eventcollector.eventbuilder;
 
 import static com.pronoia.splunk.eventcollector.EventCollectorInfo.EVENT_BODY_KEY;
 import static com.pronoia.splunk.eventcollector.EventCollectorInfo.FIELDS_KEY;
@@ -30,7 +26,9 @@ import com.pronoia.splunk.eventcollector.EventBuilder;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +44,7 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
   String sourcetype;
   String index;
 
-  // Other system properties, if what dpresent
-  String karafName;
+  Map<String, String> includedSystemProperties;
 
   Map<String, Object> fields;
 
@@ -432,23 +429,80 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
     return jsonString;
   }
 
-
-  /**
-   * If the Karaf container is detected, get it's name.
-   *
-   * @return the name of the detected Karaf container.
-   */
-  public String getKarafName() {
-    return karafName;
+  public boolean hasIncludedSystemProperties() {
+    return includedSystemProperties != null && !includedSystemProperties.isEmpty();
   }
 
-  /**
-   * Set the Karaf container name.
-   *
-   * @param karafName the new value for the Karaf container name.
-   */
-  public void setKarafName(final String karafName) {
-    this.karafName = karafName;
+  public Map<String, String> getIncludedSystemProperties() {
+    Map<String, String> answer = new TreeMap<>();
+
+    if (hasIncludedSystemProperties()) {
+      answer.putAll(includedSystemProperties);
+    }
+
+    return answer;
+  }
+
+  public void setIncludedSystemProperties(List<String> systemProperties) {
+    if (includedSystemProperties == null) {
+      includedSystemProperties = new TreeMap<>();
+    } else {
+      includedSystemProperties.clear();
+    }
+
+    addIncludedSystemProperties(systemProperties);
+  }
+
+  public void setIncludedSystemProperties(Map<String, String> systemProperties) {
+    if (includedSystemProperties == null) {
+      includedSystemProperties = new TreeMap<>();
+    } else {
+      includedSystemProperties.clear();
+    }
+
+    addIncludedSystemProperties(systemProperties);
+  }
+
+  public void addIncludedSystemProperties(Map<String, String> systemProperties) {
+    if (includedSystemProperties == null) {
+      includedSystemProperties = new TreeMap<>();
+    }
+    if (systemProperties != null && !systemProperties.isEmpty()) {
+      includedSystemProperties.putAll(systemProperties);
+    }
+  }
+
+  public void addIncludedSystemProperties(List<String> systemProperties) {
+    if (includedSystemProperties == null) {
+      includedSystemProperties = new TreeMap<>();
+    }
+    if (systemProperties != null && !systemProperties.isEmpty()) {
+      for (String systemProperty : systemProperties) {
+        includeSystemProperty(systemProperty);
+      }
+    }
+  }
+
+  public void includeSystemProperty(String systemProperty, String splunkFieldName) {
+    if (includedSystemProperties == null) {
+      includedSystemProperties = new TreeMap<>();
+    }
+
+    includedSystemProperties.put(systemProperty, splunkFieldName);
+  }
+
+  public void includeSystemProperty(String systemProperty) {
+    if (includedSystemProperties == null) {
+      includedSystemProperties = new TreeMap<>();
+    }
+
+    includedSystemProperties.put(systemProperty, null);
+  }
+
+  public void removeSystemProperty(String systemProperty) {
+    if (includedSystemProperties != null) {
+      includedSystemProperties.remove(systemProperty);
+    }
   }
 
   /**
@@ -466,12 +520,34 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
     putIfValueIsNotNull(eventObject, SOURCETYPE_KEY, sourcetype);
     putIfValueIsNotNull(eventObject, INDEX_KEY, index);
 
-    if (fields != null && !fields.isEmpty()) {
-      eventObject.put(FIELDS_KEY, fields);
+    if (hasTimestamp()) {
+      eventObject.put(TIMESTAMP_KEY, String.format("%.3f", timestamp));
     }
 
-    if (timestamp != null) {
-      eventObject.put(TIMESTAMP_KEY, String.format("%.3f", timestamp));
+    if (hasIncludedSystemProperties()) {
+      for (Map.Entry<String, String> systemProperty : includedSystemProperties.entrySet()) {
+        String systemPropertyName = systemProperty.getKey();
+        if (systemPropertyName != null || !systemPropertyName.isEmpty()) {
+          String systemPropertyValue = System.getProperty(systemPropertyName, null);
+          if (systemPropertyValue != null && !systemPropertyValue.isEmpty()) {
+            String splunkFieldName = systemProperty.getValue();
+            if (splunkFieldName == null || splunkFieldName.isEmpty()) {
+              splunkFieldName = systemPropertyName;
+              systemProperty.setValue(systemPropertyName);
+            }
+            if (fields == null) {
+              fields = new HashMap<>();
+            }
+
+            fields.put(splunkFieldName, systemPropertyValue);
+          }
+        }
+      }
+
+    }
+
+    if (hasFields()) {
+      eventObject.put(FIELDS_KEY, fields);
     }
   }
 
@@ -507,5 +583,15 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
     } else if (value != null) {
       eventObject.put(key, value);
     }
+  }
+
+  protected void copyConfiguration(JacksonEventBuilderSupport<E> sourceEventBuilder) {
+    this.timestamp = sourceEventBuilder.timestamp;
+    this.host = sourceEventBuilder.host;
+    this.source = sourceEventBuilder.source;
+    this.sourcetype = sourceEventBuilder.sourcetype;
+    this.index = sourceEventBuilder.index;
+
+    this.setIncludedSystemProperties(sourceEventBuilder.includedSystemProperties);
   }
 }

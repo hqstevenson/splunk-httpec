@@ -15,12 +15,15 @@
  * limitations under the License.
  */
 
-package com.pronoia.splunk.eventcollector.builder;
+package com.pronoia.splunk.eventcollector.eventbuilder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import com.pronoia.splunk.eventcollector.eventbuilder.JacksonEventBuilderSupport;
+import com.pronoia.splunk.eventcollector.stub.JacksonEventBuilderSupportStub;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +39,7 @@ public class JacksonEventBuilderSupportConfigurationTest {
 
   @Before
   public void setUp() throws Exception {
-    instance = new JacksonEventBuilderSupport<String>() {
-    };
+    instance = new JacksonEventBuilderSupportStub();
   }
 
   /**

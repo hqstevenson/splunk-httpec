@@ -15,9 +15,11 @@
  * limitations under the License.
  */
 
-package com.pronoia.splunk.eventcollector.builder;
+package com.pronoia.splunk.eventcollector.eventbuilder;
 
 import static org.junit.Assert.assertEquals;
+
+import com.pronoia.splunk.eventcollector.builder.StringEventBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class StringEventBuilderTest {
   static final long TEST_TIMESTAMP_IN_MILLISECONDS = 1491346209382L;
   static final double MILLISECONDS_PER_SECOND = 1000.0;
 
-  StringEventBuilder instance;
+  com.pronoia.splunk.eventcollector.builder.StringEventBuilder instance;
 
   @Before
   public void setUp() throws Exception {

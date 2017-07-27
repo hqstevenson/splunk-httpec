@@ -15,9 +15,12 @@
  * limitations under the License.
  */
 
-package com.pronoia.splunk.eventcollector.builder;
+package com.pronoia.splunk.eventcollector.eventbuilder;
 
 import static org.junit.Assert.assertEquals;
+
+import com.pronoia.splunk.eventcollector.eventbuilder.JacksonEventBuilderSupport;
+import com.pronoia.splunk.eventcollector.stub.JacksonEventBuilderSupportStub;
 
 import org.json.simple.JSONObject;
 import org.junit.Before;
@@ -27,12 +30,11 @@ import org.junit.Test;
  * Test JSON serialization for the EventBuilderSupport class.
  */
 public class JacksonEventBuilderSupportTest {
-  JacksonEventBuilderSupport<Object> instance;
+  JacksonEventBuilderSupport<String> instance;
 
   @Before
   public void setUp() throws Exception {
-    instance = new JacksonEventBuilderSupport<Object>() {
-    };
+    instance = new JacksonEventBuilderSupportStub();
   }
 
   /**

@@ -494,4 +494,12 @@ public interface EventBuilder<E> {
    */
   String build();
 
+
+  /**
+   * Create a duplicate EventBuilder.
+   *
+   * @return a duplicate of this
+   */
+   EventBuilder<E> duplicate();
+
 }

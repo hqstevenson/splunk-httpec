@@ -22,6 +22,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import com.pronoia.splunk.eventcollector.stub.EventBuilderSupportStub;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,8 +38,7 @@ public class EventBuilderSupportConfigurationTest {
 
   @Before
   public void setUp() throws Exception {
-    instance = new EventBuilderSupport<String>() {
-    };
+    instance = new EventBuilderSupportStub();
   }
 
   /**

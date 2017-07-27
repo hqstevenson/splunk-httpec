@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package com.pronoia.splunk.eventcollector.builder;
+package com.pronoia.splunk.eventcollector.eventbuilder;
 
 import com.pronoia.splunk.eventcollector.EventBuilder;
 
 /**
- * Simple implementation for using a String as the event body.
+ * Simple implementation for using an Object as the event body.
  */
-@Deprecated
-public class StringEventBuilder extends EventBuilderSupport<String> {
+public class ObjectEventBuilder extends JacksonEventBuilderSupport<Object> {
 
   @Override
-  public EventBuilder<String> duplicate() {
-    StringEventBuilder answer = new StringEventBuilder();
+  public EventBuilder<Object> duplicate() {
+    ObjectEventBuilder answer = new ObjectEventBuilder();
 
     answer.copyConfiguration(this);
 

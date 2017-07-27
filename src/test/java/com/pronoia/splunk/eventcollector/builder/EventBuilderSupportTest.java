@@ -19,6 +19,9 @@ package com.pronoia.splunk.eventcollector.builder;
 
 import static org.junit.Assert.assertEquals;
 
+import com.pronoia.splunk.eventcollector.EventBuilder;
+import com.pronoia.splunk.eventcollector.stub.EventBuilderSupportStub;
+
 import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,8 +34,7 @@ public class EventBuilderSupportTest {
 
   @Before
   public void setUp() throws Exception {
-    instance = new EventBuilderSupport<String>() {
-    };
+    instance = new EventBuilderSupportStub();
   }
 
   /**
