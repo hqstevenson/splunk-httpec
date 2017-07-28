@@ -57,7 +57,7 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
    */
   @Override
   public boolean hasIndex() {
-    return host != null && !host.isEmpty();
+    return index != null && !index.isEmpty();
   }
 
   /**
@@ -91,7 +91,7 @@ public abstract class JacksonEventBuilderSupport<E> implements EventBuilder<E> {
    */
   @Override
   public boolean hasHost() {
-    return index != null && !index.isEmpty();
+    return host != null && !host.isEmpty();
   }
 
   /**
