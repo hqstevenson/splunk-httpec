@@ -30,11 +30,52 @@ import java.util.Map;
  */
 public interface EventBuilder<E> {
   /**
-   * Determine if the instance has a Splunk 'index' default field configured.
+   * Determine if the instance has a Splunk 'host' default field configured.
+   *
+   * @return true if 'host' field is configured; false otherwise
+   */
+  boolean hasDefaultHost();
+
+  /**
+   * Get the default value of the Splunk 'host' default field for the event that will
+   * be used on the next invocation of the build() method.
+   *
+   * @return the Splunk 'host' default field value
+   */
+  String getDefaultHost();
+
+  /**
+   * Set the default value for the Splunk 'host' default field that will be used on the
+   * next invocation of the build() method.
+   *
+   * <p>This value is typically a hostname, IP address or fully qualified
+   * domain name of the host from which the event originated.
+   *
+   * @param host value for the 'host' default field.
+   */
+  void setDefaultHost(String host);
+
+  /**
+   * Determine and set the default value for the Splunk 'host' default field that will
+   * be used on the next invocation of the build() method.
+   *
+   * <p>This method sets the 'host' value to the value returned from
+   * InetAddress.getLocalHost().getHostName()
+   */
+  default void setDefaultHost() {
+    try {
+      this.setDefaultHost(InetAddress.getLocalHost().getHostName());
+    } catch (UnknownHostException unknowHostException) {
+      // Ignore
+    }
+  }
+
+  /**
+   * Determine if the instance has a default  Splunk 'index' default field configured.
    *
    * @return true if 'index' field is configured; false otherwise
    */
-  boolean hasIndex();
+  boolean hasDefaultIndex();
 
   /**
    * Get the name of Splunk 'index' default field for the event that will be
@@ -42,10 +83,10 @@ public interface EventBuilder<E> {
    *
    * @return the Splunk 'index' field value
    */
-  String getIndex();
+  String getDefaultIndex();
 
   /**
-   * Set the value for the Splunk 'index' default field that will be used on
+   * Set the default value for the Splunk 'index' default field that will be used on
    * the next invocation of the build() method.
    *
    * <p>NOTE:  The Splunk Index must be created in the Splunk environment prior to
@@ -54,7 +95,60 @@ public interface EventBuilder<E> {
    *
    * @param index value of the Splunk Index field
    */
-  void setIndex(String index);
+  void setDefaultIndex(String index);
+
+  /**
+   * Determine if the instance has a Splunk 'source' default field configured.
+   *
+   * @return true if 'source' field is configured; false otherwise
+   */
+  boolean hasDefaultSource();
+
+  /**
+   * Get the default value of Splunk 'source' default field for the event that will be
+   * used on the next invocation of the build() method.
+   *
+   * @return the Splunk 'source' default field value
+   */
+  String getDefaultSource();
+
+  /**
+   * Set the default value for the Splunk 'source' default field that will be used on
+   * the next invocation of the build() method.
+   *
+   * <p>This value is typically the name of the file, stream or other input from
+   * which the event originates.
+   *
+   * @param source value for the 'source' default field.
+   */
+  void setDefaultSource(String source);
+
+  /**
+   * Determine if the instance has a Splunk 'sourcetype' default field
+   * configured.
+   *
+   * @return true if 'sourcetype' field is configured; false otherwise
+   */
+  boolean hasDefaultSourcetype();
+
+  /**
+   * Get the default value of Splunk 'sourcetype' default field for the event that will
+   * be used on the next invocation of the build() method.
+   *
+   * @return the Splunk 'sourcetype' default field value
+   */
+  String getDefaultSourcetype();
+
+  /**
+   * Set the default value for the Splunk 'sourcetype' default field that will be used
+   * on the next invocation of the build() method.
+   *
+   * <p>This value is typically a name used to identify the format of the data in
+   * the event.
+   *
+   * @param defaultSourcetype default value for the 'sourcetype' default field.
+   */
+  void setDefaultSourcetype(String defaultSourcetype);
 
   /**
    * Determine if the instance has a Splunk 'host' default field configured.
@@ -96,6 +190,33 @@ public interface EventBuilder<E> {
       // Ignore
     }
   }
+
+  /**
+   * Determine if the instance has a Splunk 'index' default field configured.
+   *
+   * @return true if 'index' field is configured; false otherwise
+   */
+  boolean hasIndex();
+
+  /**
+   * Get the name of Splunk 'index' default field for the event that will be
+   * used on the next invocation of the build() method.
+   *
+   * @return the Splunk 'index' field value
+   */
+  String getIndex();
+
+  /**
+   * Set the value for the Splunk 'index' default field that will be used on
+   * the next invocation of the build() method.
+   *
+   * <p>NOTE:  The Splunk Index must be created in the Splunk environment prior to
+   * use.  Using in invalid value for the Splunk 'index' default field may
+   * result in data loss.
+   *
+   * @param index value of the Splunk Index field
+   */
+  void setIndex(String index);
 
   /**
    * Determine if the instance has a Splunk 'source' default field configured.
@@ -149,6 +270,95 @@ public interface EventBuilder<E> {
    * @param sourcetype value for the 'sourcetype' default field.
    */
   void setSourcetype(String sourcetype);
+
+  /**
+   * Determine if the instance has a Splunk 'timestamp' configured.
+   *
+   * @return true if 'timestamp' field is configured; false otherwise
+   */
+  boolean hasTimestamp();
+
+  /**
+   * Get the value of Splunk 'timestamp' default field for the event that will
+   * be used on the next invocation of the build() method.
+   *
+   * @return the Splunk 'timestamp' default field value
+   */
+  Double getTimestamp();
+
+  /**
+   * Set the value for the Splunk 'timestamp' default field that will be used
+   * on the next invocation of the build() method.
+   *
+   * <p>This value is typically the time at which the event occurred.
+   *
+   * @param epochSeconds value for the 'timestamp' default field as the number of seconds since 1/1/1970 GMT.
+   */
+  void setTimestamp(double epochSeconds);
+
+  /**
+   * Set the value for the Splunk 'timestamp' default field that will be used on
+   * the next invocation of the build() method.
+   *
+   * <p>This value is typically the time at which the event occurred.
+   *
+   * @param epochMilliseconds value for the 'timestamp' default field as the number of milliseconds since 1/1/1970 GMT.
+   */
+  default void setTimestamp(long epochMilliseconds) {
+    final double millisecondsPerSecond = 1000.0;
+
+    this.setTimestamp(epochMilliseconds / millisecondsPerSecond);
+  }
+
+  /**
+   * Set the value for the Splunk 'timestamp' default field that will be used
+   * on the next invocation of the build() method.
+   *
+   * <p>This value is typically the time at which the event occurred.
+   *
+   * @param date value for the 'timestamp' default field.
+   */
+  default void setTimestamp(Date date) {
+    final double millisecondsPerSecond = 1000.0;
+
+    this.setTimestamp(date.getTime() / millisecondsPerSecond);
+  }
+
+  /**
+   * Set the value for the Splunk 'timestamp' default field that will be used on
+   * the next invocation of the build() method.
+   *
+   * <p>This method sets the 'timestamp' value to the value returned from System.currentTImeMillis().
+   */
+  default void setTimestamp() {
+    final double millisecondsPerSecond = 1000.0;
+
+    this.setTimestamp(System.currentTimeMillis() / millisecondsPerSecond);
+  }
+
+
+  /**
+   * Determine if the instance has an event configured.
+   *
+   * @return true if an event has been configured; false otherwise
+   */
+  boolean hasEventBody();
+
+  /**
+   * Get the body of the event that will be used on the next invocation of the
+   * build() method.
+   *
+   * @return the event body
+   */
+  E getEventBody();
+
+  /**
+   * Set the body of the event (the _raw field) that will be used on the next
+   * invocation of the build() method.
+   *
+   * @param eventBody the body of the event
+   */
+  void setEventBody(E eventBody);
 
   /**
    * Determine if the instance has additional Splunk fields configured.
@@ -223,108 +433,6 @@ public interface EventBuilder<E> {
    */
   EventBuilder<E> clearFields();
 
-  /**
-   * Determine if the instance has a Splunk 'timestamp' configured.
-   *
-   * @return true if 'timestamp' field is configured; false otherwise
-   */
-  boolean hasTimestamp();
-
-  /**
-   * Get the value of Splunk 'timestamp' default field for the event that will
-   * be used on the next invocation of the build() method.
-   *
-   * @return the Splunk 'timestamp' default field value
-   */
-  Double getTimestamp();
-
-  /**
-   * Set the value for the Splunk 'timestamp' default field that will be used
-   * on the next invocation of the build() method.
-   *
-   * <p>This value is typically the time at which the event occurred.
-   *
-   * @param epochSeconds value for the 'timestamp' default field as the number of seconds since 1/1/1970 GMT.
-   */
-  void setTimestamp(double epochSeconds);
-
-  /**
-   * Set the value for the Splunk 'timestamp' default field that will be used on
-   * the next invocation of the build() method.
-   *
-   * <p>This value is typically the time at which the event occurred.
-   *
-   * @param epochMilliseconds value for the 'timestamp' default field as the number of milliseconds since 1/1/1970 GMT.
-   */
-  default void setTimestamp(long epochMilliseconds) {
-    final double millisecondsPerSecond = 1000.0;
-
-    this.setTimestamp(epochMilliseconds / millisecondsPerSecond);
-  }
-
-  /**
-   * Set the value for the Splunk 'timestamp' default field that will be used
-   * on the next invocation of the build() method.
-   *
-   * <p>This value is typically the time at which the event occurred.
-   *
-   * @param date value for the 'timestamp' default field.
-   */
-  default void setTimestamp(Date date) {
-    final double millisecondsPerSecond = 1000.0;
-
-    this.setTimestamp(date.getTime() / millisecondsPerSecond);
-  }
-
-  /**
-   * Set the value for the Splunk 'timestamp' default field that will be used on
-   * the next invocation of the build() method.
-   *
-   * <p>This method sets the 'timestamp' value to the value returned from System.currentTImeMillis().
-   */
-  default void setTimestamp() {
-    final double millisecondsPerSecond = 1000.0;
-
-    this.setTimestamp(System.currentTimeMillis() / millisecondsPerSecond);
-  }
-
-  /**
-   * Determine if the instance has an event configured.
-   *
-   * @return true if an event has been configured; false otherwise
-   */
-  boolean hasEvent();
-
-  /**
-   * Get the body of the event that will be used on the next invocation of the
-   * build() method.
-   *
-   * @return the event body
-   */
-  E getEvent();
-
-  /**
-   * Set the body of the event (the _raw field) that will be used on the next
-   * invocation of the build() method.
-   *
-   * @param eventBody the body of the event
-   */
-  void setEvent(E eventBody);
-
-
-  /**
-   * Set the value for the Splunk Index using a fluent builder pattern.
-   *
-   * <p>See setIndex(String) for details.
-   *
-   * @param index name of the Splunk Index
-   *
-   * @return the current EventBuilder
-   */
-  default EventBuilder<E> index(String index) {
-    this.setIndex(index);
-    return this;
-  }
 
   /**
    * Set the value for the Splunk 'host' default field using a fluent builder
@@ -355,6 +463,20 @@ public interface EventBuilder<E> {
   }
 
   /**
+   * Set the value for the Splunk Index using a fluent builder pattern.
+   *
+   * <p>See setIndex(String) for details.
+   *
+   * @param index name of the Splunk Index
+   *
+   * @return the current EventBuilder
+   */
+  default EventBuilder<E> index(String index) {
+    this.setIndex(index);
+    return this;
+  }
+
+  /**
    * Set the value for the Splunk 'source' default field using a fluent builder
    * pattern.
    *
@@ -381,36 +503,6 @@ public interface EventBuilder<E> {
    */
   default EventBuilder<E> sourcetype(String sourcetype) {
     this.setSourcetype(sourcetype);
-    return this;
-  }
-
-  /**
-   * Set the map of additional indexed field names and values using a
-   * fluent builder pattern.
-   *
-   * <p>See the setFields(Map) method for details.
-   *
-   * @param fieldMap the map of field names and values
-   *
-   * @return the current EventBuilder
-   */
-  default EventBuilder<E> fields(Map<String, Object> fieldMap) {
-    this.setFields(fieldMap);
-    return this;
-  }
-
-  /**
-   * Set the value of a indexed field using a builder pattern.
-   *
-   * <p>See setField(String, String...) for details.
-   *
-   * @param fieldName   the name of the indexed field.
-   * @param fieldValues the value(s) of the indexed field
-   *
-   * @return the current EventBuilder
-   */
-  default EventBuilder<E> field(String fieldName, String... fieldValues) {
-    this.setField(fieldName, fieldValues);
     return this;
   }
 
@@ -472,6 +564,7 @@ public interface EventBuilder<E> {
     return this;
   }
 
+
   /**
    * Set the body of the Splunk event using a builder pattern.
    *
@@ -481,10 +574,41 @@ public interface EventBuilder<E> {
    *
    * @return the current EventBuilder
    */
-  default EventBuilder<E> event(E eventBody) {
-    this.setEvent(eventBody);
+  default EventBuilder<E> eventBody(E eventBody) {
+    this.setEventBody(eventBody);
     return this;
   }
+
+  /**
+   * Set the map of additional indexed field names and values using a
+   * fluent builder pattern.
+   *
+   * <p>See the setFields(Map) method for details.
+   *
+   * @param fieldMap the map of field names and values
+   *
+   * @return the current EventBuilder
+   */
+  default EventBuilder<E> fields(Map<String, Object> fieldMap) {
+    this.setFields(fieldMap);
+    return this;
+  }
+
+  /**
+   * Set the value of a indexed field using a builder pattern.
+   *
+   * <p>See setField(String, String...) for details.
+   *
+   * @param fieldName   the name of the indexed field.
+   * @param fieldValues the value(s) of the indexed field
+   *
+   * @return the current EventBuilder
+   */
+  default EventBuilder<E> field(String fieldName, String... fieldValues) {
+    this.setField(fieldName, fieldValues);
+    return this;
+  }
+
 
   /**
    * Build the JSON-formatted event suitable for the Splunk HTTP Event

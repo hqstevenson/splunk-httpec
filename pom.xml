@@ -23,7 +23,7 @@
     <groupId>com.pronoia.splunk</groupId>
     <artifactId>splunk.httpec</artifactId>
     <packaging>bundle</packaging>
-    <version>0.1.7</version>
+    <version>0.5.0-SNAPSHOT</version>
 
     <name>Splunk HTTP Event Collector Support</name>
 
@@ -32,12 +32,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.7.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
         </dependency>
 
         <dependency>
@@ -61,6 +55,13 @@
         </dependency>
 
         <!-- Test Dependencies -->
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -135,4 +136,17 @@
             </plugin>
         </plugins>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>libs-ucla-dev</id>
+            <name>UCLA Development JARs</name>
+            <url>https://esbartifactory.medctr.ucla.edu:6100/artifactory/libs-ext-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>libs-ucla-snapshot</id>
+            <name>UCLA Development SNAPSHOT JARs</name>
+            <url>https://esbartifactory.medctr.ucla.edu:6100/artifactory/libs-ext-snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>

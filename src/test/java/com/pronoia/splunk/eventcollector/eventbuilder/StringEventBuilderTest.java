@@ -19,8 +19,6 @@ package com.pronoia.splunk.eventcollector.eventbuilder;
 
 import static org.junit.Assert.assertEquals;
 
-import com.pronoia.splunk.eventcollector.builder.StringEventBuilder;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +32,7 @@ public class StringEventBuilderTest {
   static final long TEST_TIMESTAMP_IN_MILLISECONDS = 1491346209382L;
   static final double MILLISECONDS_PER_SECOND = 1000.0;
 
-  com.pronoia.splunk.eventcollector.builder.StringEventBuilder instance;
+  StringEventBuilder instance;
 
   @Before
   public void setUp() throws Exception {
@@ -51,12 +49,12 @@ public class StringEventBuilderTest {
         = "{"
         +     "\"host\":\"dummy-host\","
         +     "\"index\":\"dummy-index\","
-        +     "\"sourcetype\":\"dummy-sourcetype\","
         +     "\"source\":\"dummy-source\","
+        +     "\"sourcetype\":\"dummy-sourcetype\","
         +     "\"time\":\"1491346209.382\","
         +     "\"fields\":{"
-        +         "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueOne\"],"
-        +         "\"fieldOne\":\"fieldOneValue\""
+        +         "\"fieldOne\":\"fieldOneValue\","
+        +         "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueOne\"]"
         +     "},"
         +     "\"event\":\"Dummy Event Body\""
         + "}";
@@ -70,7 +68,7 @@ public class StringEventBuilderTest {
         .field("fieldOne", "fieldOneValue")
         .field("fieldTwo", "fieldTwoValueOne", "fieldTwoValueOne")
         .timestamp(TEST_TIMESTAMP_IN_MILLISECONDS / MILLISECONDS_PER_SECOND)
-        .event("Dummy Event Body");
+        .eventBody("Dummy Event Body");
 
 
     assertEquals(expected, instance.build());

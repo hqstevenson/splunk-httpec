@@ -286,24 +286,24 @@ public class JacksonEventBuilderSupportConfigurationTest {
    * @throws Exception in the event of a test error.
    */
   @Test
-  public void testGetEvent() throws Exception {
+  public void testGetEventBody() throws Exception {
     final String expected = "Dummy Event";
 
     assertNull("Event body should be null on creation", instance.eventBody);
     instance.eventBody = expected;
 
-    assertEquals(expected, instance.getEvent());
+    assertEquals(expected, instance.getEventBody());
   }
 
   /**
    * @throws Exception in the event of a test error.
    */
   @Test
-  public void testSetEvent() throws Exception {
+  public void testSetEventBody() throws Exception {
     final String expected = "Dummy Event";
 
     assertNull("Event body should be null on creation", instance.eventBody);
-    instance.setEvent(expected);
+    instance.setEventBody(expected);
 
     assertEquals(expected, instance.eventBody);
   }

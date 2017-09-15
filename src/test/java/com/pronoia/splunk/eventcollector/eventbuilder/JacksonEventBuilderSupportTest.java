@@ -19,7 +19,6 @@ package com.pronoia.splunk.eventcollector.eventbuilder;
 
 import static org.junit.Assert.assertEquals;
 
-import com.pronoia.splunk.eventcollector.eventbuilder.JacksonEventBuilderSupport;
 import com.pronoia.splunk.eventcollector.stub.JacksonEventBuilderSupportStub;
 
 import org.json.simple.JSONObject;
@@ -32,9 +31,12 @@ import org.junit.Test;
 public class JacksonEventBuilderSupportTest {
   JacksonEventBuilderSupport<String> instance;
 
+  Double timestamp = 1505323567.566;
+
   @Before
   public void setUp() throws Exception {
     instance = new JacksonEventBuilderSupportStub();
+    instance.timestamp(timestamp);
   }
 
   /**
@@ -42,13 +44,19 @@ public class JacksonEventBuilderSupportTest {
    */
   @Test
   public void testSerializeFieldsWithIndex() throws Exception {
+    final String expected = "{"
+        + "\"host\":\"" + instance.getDefaultHost() + "\","
+        + "\"index\":\"dummy-index\","
+        + "\"time\":\"1505323567.566\""
+        + "}";
+
     JSONObject tmpObject = new JSONObject();
 
     instance.index("dummy-index");
 
-    instance.serializeFields(tmpObject);
+    instance.addDefaultFieldsToMap(tmpObject);
 
-    assertEquals("{\"index\":\"dummy-index\"}", tmpObject.toJSONString());
+    assertEquals(expected, tmpObject.toJSONString());
   }
 
   /**
@@ -60,9 +68,9 @@ public class JacksonEventBuilderSupportTest {
 
     instance.host("dummy-host");
 
-    instance.serializeFields(tmpObject);
+    instance.addDefaultFieldsToMap(tmpObject);
 
-    assertEquals("{\"host\":\"dummy-host\"}", tmpObject.toJSONString());
+    assertEquals("{\"host\":\"dummy-host\",\"time\":\"1505323567.566\"}", tmpObject.toJSONString());
   }
 
   /**
@@ -70,13 +78,19 @@ public class JacksonEventBuilderSupportTest {
    */
   @Test
   public void testSerializeFieldsWithSource() throws Exception {
+    final String expected = "{"
+        + "\"host\":\"" + instance.getDefaultHost() + "\","
+        + "\"source\":\"dummy-source\","
+        + "\"time\":\"1505323567.566\""
+        + "}";
+
     JSONObject tmpObject = new JSONObject();
 
     instance.source("dummy-source");
 
-    instance.serializeFields(tmpObject);
+    instance.addDefaultFieldsToMap(tmpObject);
 
-    assertEquals("{\"source\":\"dummy-source\"}", tmpObject.toJSONString());
+    assertEquals(expected, tmpObject.toJSONString());
   }
 
   /**
@@ -84,13 +98,19 @@ public class JacksonEventBuilderSupportTest {
    */
   @Test
   public void testSerializeFieldsWithSourcetype() throws Exception {
+    final String expected = "{"
+        + "\"host\":\"" + instance.getDefaultHost() + "\","
+        + "\"sourcetype\":\"dummy-sourcetype\","
+        + "\"time\":\"1505323567.566\""
+        + "}";
+
     JSONObject tmpObject = new JSONObject();
 
     instance.sourcetype("dummy-sourcetype");
 
-    instance.serializeFields(tmpObject);
+    instance.addDefaultFieldsToMap(tmpObject);
 
-    assertEquals("{\"sourcetype\":\"dummy-sourcetype\"}", tmpObject.toJSONString());
+    assertEquals(expected, tmpObject.toJSONString());
   }
 
   /**
@@ -101,12 +121,13 @@ public class JacksonEventBuilderSupportTest {
     JSONObject tmpObject = new JSONObject();
 
     instance
-        .field("fieldOne", "fieldOneValue")
+        .field("fieldOne", "fieldOneValueOne")
         .field("fieldTwo", "fieldTwoValueOne");
 
-    instance.serializeFields(tmpObject);
+    instance.addAdditionalFieldsToMap(tmpObject);
 
-    assertEquals("{\"fields\":{\"fieldTwo\":\"fieldTwoValueOne\",\"fieldOne\":\"fieldOneValue\"}}", tmpObject.toJSONString());
+    assertEquals("{\"fields\":{\"fieldOne\":\"fieldOneValueOne\",\"fieldTwo\":\"fieldTwoValueOne\"}}", tmpObject
+        .toJSONString());
   }
 
   /**
@@ -114,17 +135,23 @@ public class JacksonEventBuilderSupportTest {
    */
   @Test
   public void testSerializeFieldsWithMultivaluedFields() throws Exception {
-    final String expected = "{\"fields\":{"
-        + "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueTwo\"],"
-        + "\"fieldOne\":[\"fieldOneValueOne\",\"fieldOneValueTwo\"]}"
+    final String expected = "{"
+        + "\"host\":\"" + instance.getDefaultHost() + "\","
+        + "\"time\":\"1505323567.566\","
+        + "\"fields\":{"
+        +   "\"fieldOne\":[\"fieldOneValueOne\",\"fieldOneValueTwo\"],"
+        +   "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueTwo\"]"
+        +   "}"
         + "}";
+
     JSONObject tmpObject = new JSONObject();
 
     instance
         .field("fieldOne", "fieldOneValueOne", "fieldOneValueTwo")
         .field("fieldTwo", "fieldTwoValueOne", "fieldTwoValueTwo");
 
-    instance.serializeFields(tmpObject);
+    instance.addDefaultFieldsToMap(tmpObject);
+    instance.addAdditionalFieldsToMap(tmpObject);
 
     assertEquals(expected, tmpObject.toJSONString());
   }
@@ -134,6 +161,11 @@ public class JacksonEventBuilderSupportTest {
    */
   @Test
   public void testSerializeFieldsWithTimestamp() throws Exception {
+    final String expected = "{"
+        + "\"host\":\"" + instance.getDefaultHost() + "\","
+        + "\"time\":\"1491346209.382\""
+        + "}";
+
     final long testTimestampInMilliseconds = 1491346209382L;
     final double millisecondsPerSecond = 1000.0;
 
@@ -141,9 +173,9 @@ public class JacksonEventBuilderSupportTest {
 
     instance.timestamp(testTimestampInMilliseconds / millisecondsPerSecond);
 
-    instance.serializeFields(tmpObject);
+    instance.addDefaultFieldsToMap(tmpObject);
 
-    assertEquals("{\"time\":\"1491346209.382\"}", tmpObject.toJSONString());
+    assertEquals(expected, tmpObject.toJSONString());
   }
 
   /**
@@ -156,7 +188,8 @@ public class JacksonEventBuilderSupportTest {
         + "\"index\":\"dummy-index\","
         + "\"sourcetype\":\"dummy-sourcetype\","
         + "\"source\":\"dummy-source\","
-        + "\"fields\":{\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueOne\"],\"fieldOne\":\"fieldOneValue\"}"
+        + "\"time\":\"1505323567.566\","
+        + "\"fields\":{\"fieldOne\":\"fieldOneValue\",\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueTwo\"]}"
         + "}";
 
     JSONObject tmpObject = new JSONObject();
@@ -167,9 +200,10 @@ public class JacksonEventBuilderSupportTest {
         .source("dummy-source")
         .sourcetype("dummy-sourcetype")
         .field("fieldOne", "fieldOneValue")
-        .field("fieldTwo", "fieldTwoValueOne", "fieldTwoValueOne");
+        .field("fieldTwo", "fieldTwoValueOne", "fieldTwoValueTwo");
 
-    instance.serializeFields(tmpObject);
+    instance.addDefaultFieldsToMap(tmpObject);
+    instance.addAdditionalFieldsToMap(tmpObject);
 
     assertEquals(expected, tmpObject.toJSONString());
   }
@@ -181,9 +215,9 @@ public class JacksonEventBuilderSupportTest {
   public void testSerializeBodyWithNullEventBody() throws Exception {
     JSONObject tmpObject = new JSONObject();
 
-    instance.serializeBody(tmpObject);
+    instance.addEventBodyToMap(tmpObject);
 
-    assertEquals("{\"event\":null}", tmpObject.toJSONString());
+    assertEquals("{\"event\":\"null event body\"}", tmpObject.toJSONString());
   }
 
   /**
@@ -193,8 +227,8 @@ public class JacksonEventBuilderSupportTest {
   public void testSerializeBodyWithEmptyEventBody() throws Exception {
     JSONObject tmpObject = new JSONObject();
 
-    instance.event("");
-    instance.serializeBody(tmpObject);
+    instance.eventBody("");
+    instance.addEventBodyToMap(tmpObject);
 
     assertEquals("{\"event\":\"\"}", tmpObject.toJSONString());
   }
@@ -206,8 +240,8 @@ public class JacksonEventBuilderSupportTest {
   public void testSerializeBody() throws Exception {
     JSONObject tmpObject = new JSONObject();
 
-    instance.event("Dummy Event Body");
-    instance.serializeBody(tmpObject);
+    instance.eventBody("Dummy Event Body");
+    instance.addEventBodyToMap(tmpObject);
 
     assertEquals("{\"event\":\"Dummy Event Body\"}", tmpObject.toJSONString());
   }
@@ -277,19 +311,16 @@ public class JacksonEventBuilderSupportTest {
    */
   @Test
   public void testBuild() throws Exception {
-    final long testEpochMilliseconds = 1491346209382L;
-    final double millisecondsPerSecond = 1000.0;
-
     final String expected =
         "{"
             + "\"host\":\"dummy-host\","
             + "\"index\":\"dummy-index\","
-            + "\"sourcetype\":\"dummy-sourcetype\","
             + "\"source\":\"dummy-source\","
-            + "\"time\":\"1491346209.382\","
+            + "\"sourcetype\":\"dummy-sourcetype\","
+            + "\"time\":\"1505323567.566\","
             + "\"fields\":{"
-            + "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueOne\"],"
-            + "\"fieldOne\":\"fieldOneValue\""
+            + "\"fieldOne\":\"fieldOneValue\","
+            + "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueTwo\"]"
             + "},"
             + "\"event\":\"Dummy Event Body\""
             + "}";
@@ -300,9 +331,8 @@ public class JacksonEventBuilderSupportTest {
         .source("dummy-source")
         .sourcetype("dummy-sourcetype")
         .field("fieldOne", "fieldOneValue")
-        .field("fieldTwo", "fieldTwoValueOne", "fieldTwoValueOne")
-        .timestamp(testEpochMilliseconds / millisecondsPerSecond)
-        .event("Dummy Event Body");
+        .field("fieldTwo", "fieldTwoValueOne", "fieldTwoValueTwo")
+        .eventBody("Dummy Event Body");
 
 
     assertEquals(expected, instance.build());
