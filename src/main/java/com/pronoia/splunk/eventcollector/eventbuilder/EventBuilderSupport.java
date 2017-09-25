@@ -623,31 +623,31 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
 
     String hostFieldValue = getHostFieldValue();
     if (hostFieldValue != null && !hostFieldValue.isEmpty()) {
-      log.info("Adding '{}'={}", HOST_KEY, hostFieldValue);
+      log.debug("Adding '{}'={}", HOST_KEY, hostFieldValue);
       map.put(HOST_KEY, hostFieldValue);
     }
 
     String indexFieldValue = getIndexFieldValue();
     if (indexFieldValue != null && !indexFieldValue.isEmpty()) {
-      log.info("Adding '{}'={}", INDEX_KEY, indexFieldValue);
+      log.debug("Adding '{}'={}", INDEX_KEY, indexFieldValue);
       map.put(INDEX_KEY, indexFieldValue);
     }
 
     String sourceFieldValue = getSourceFieldValue();
     if (sourceFieldValue != null && !sourceFieldValue.isEmpty()) {
-      log.info("Adding '{}'={}", SOURCE_KEY, sourceFieldValue);
+      log.debug("Adding '{}'={}", SOURCE_KEY, sourceFieldValue);
       map.put(SOURCE_KEY, sourceFieldValue);
     }
 
     String sourcetypeFieldValue = getSourcetypeFieldValue();
     if (sourcetypeFieldValue != null && !sourcetypeFieldValue.isEmpty()) {
-      log.info("Adding '{}'={}", SOURCETYPE_KEY, sourcetypeFieldValue);
+      log.debug("Adding '{}'={}", SOURCETYPE_KEY, sourcetypeFieldValue);
       map.put(SOURCETYPE_KEY, sourcetypeFieldValue);
     }
 
     String timestampFieldValue = getTimestampFieldValue();
     if (timestampFieldValue != null && !timestampFieldValue.isEmpty()) {
-      log.info("Adding '{}'={}", TIMESTAMP_KEY, timestampFieldValue);
+      log.debug("Adding '{}'={}", TIMESTAMP_KEY, timestampFieldValue);
       map.put(TIMESTAMP_KEY, timestampFieldValue);
     }
   }
