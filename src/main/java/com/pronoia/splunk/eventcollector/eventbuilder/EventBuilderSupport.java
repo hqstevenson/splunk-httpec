@@ -22,13 +22,11 @@ import static com.pronoia.splunk.eventcollector.EventCollectorInfo.SOURCE_KEY;
 import static com.pronoia.splunk.eventcollector.EventCollectorInfo.TIMESTAMP_KEY;
 
 import com.pronoia.splunk.eventcollector.EventBuilder;
-
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,11 +113,6 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
   @Override
   public void setDefaultSourcetype(String defaultSourcetype) {
     this.defaultSourcetype = defaultSourcetype;
-  }
-
-  @Override
-  public EventBuilder<E> duplicate() {
-    return null;
   }
 
   /**
@@ -453,7 +446,31 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     return this;
   }
 
+  /**
+   * Build the JSON-formatted event suitable for the Splunk HTTP Event Collector.
+   *
+   * @return the JSON-formatted event
+   */
+  @Override
+  public String build() {
+    Map<String, Object> eventMap = new LinkedHashMap<>();
 
+    addDefaultFieldsToMap(eventMap);
+
+    Map<String, Object> additionalFields = new LinkedHashMap<>();
+    addAdditionalFieldsToMap(additionalFields);
+    if (!additionalFields.isEmpty()) {
+      eventMap.put(FIELDS_KEY, additionalFields);
+    }
+
+    addEventBodyToMap(eventMap);
+
+    String answer = convertMapToJson(eventMap);
+
+    resetTransientData();
+
+    return answer;
+  }
 
   protected abstract String convertMapToJson(Map<String, Object> map);
 
@@ -471,7 +488,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     return answer;
   }
 
-  public void setIncludedSystemProperties(Map<String, String> systemProperties) {
+  public void setIncludedSystemProperties(List<String> systemProperties) {
     if (includedSystemProperties == null) {
       includedSystemProperties = new TreeMap<>();
     } else {
@@ -481,7 +498,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     addIncludedSystemProperties(systemProperties);
   }
 
-  public void setIncludedSystemProperties(List<String> systemProperties) {
+  public void setIncludedSystemProperties(Map<String, String> systemProperties) {
     if (includedSystemProperties == null) {
       includedSystemProperties = new TreeMap<>();
     } else {
@@ -531,26 +548,6 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     if (includedSystemProperties != null) {
       includedSystemProperties.remove(systemProperty);
     }
-  }
-
-  /**
-   * Build the JSON-formatted event suitable for the Splunk HTTP Event Collector.
-   *
-   * @return the JSON-formatted event
-   */
-  @Override
-  public String build() {
-    Map<String, Object> eventMap = new LinkedHashMap<>();
-
-    addDefaultFieldsToMap(eventMap);
-    addAdditionalFieldsToMap(eventMap);
-    addEventBodyToMap(eventMap);
-
-    String answer = convertMapToJson(eventMap);
-
-    resetTransientData();
-
-    return answer;
   }
 
   public String getHostFieldValue() {
@@ -613,6 +610,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
 
     return answer;
   }
+
   /**
    * Add the default Splunk fields to the event.
    *
@@ -625,26 +623,31 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
 
     String hostFieldValue = getHostFieldValue();
     if (hostFieldValue != null && !hostFieldValue.isEmpty()) {
+      log.info("Adding '{}'={}", HOST_KEY, hostFieldValue);
       map.put(HOST_KEY, hostFieldValue);
     }
 
     String indexFieldValue = getIndexFieldValue();
     if (indexFieldValue != null && !indexFieldValue.isEmpty()) {
+      log.info("Adding '{}'={}", INDEX_KEY, indexFieldValue);
       map.put(INDEX_KEY, indexFieldValue);
     }
 
     String sourceFieldValue = getSourceFieldValue();
     if (sourceFieldValue != null && !sourceFieldValue.isEmpty()) {
+      log.info("Adding '{}'={}", SOURCE_KEY, sourceFieldValue);
       map.put(SOURCE_KEY, sourceFieldValue);
     }
 
     String sourcetypeFieldValue = getSourcetypeFieldValue();
     if (sourcetypeFieldValue != null && !sourcetypeFieldValue.isEmpty()) {
+      log.info("Adding '{}'={}", SOURCETYPE_KEY, sourcetypeFieldValue);
       map.put(SOURCETYPE_KEY, sourcetypeFieldValue);
     }
 
     String timestampFieldValue = getTimestampFieldValue();
     if (timestampFieldValue != null && !timestampFieldValue.isEmpty()) {
+      log.info("Adding '{}'={}", TIMESTAMP_KEY, timestampFieldValue);
       map.put(TIMESTAMP_KEY, timestampFieldValue);
     }
   }
@@ -660,11 +663,11 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     log.debug("Adding additional event fields");
 
     if (hasIncludedSystemProperties()) {
-      addSystemPropertiesToMap(getFields());
+      addSystemPropertiesToMap(map);
     }
 
     if (hasFields()) {
-      map.put(FIELDS_KEY, fields);
+      map.putAll(fields);
     }
   }
 
@@ -706,7 +709,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
   protected void addEventBodyToMap(Map<String, Object> map) {
     log.debug("Adding event body");
     if (hasEventBody()) {
-      if (eventBody instanceof Map  ||  eventBody instanceof List) {
+      if (eventBody instanceof Map || eventBody instanceof List) {
         map.put(EVENT_BODY_KEY, eventBody);
       } else {
         map.put(EVENT_BODY_KEY, eventBody.toString());
@@ -748,12 +751,21 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
   }
 
   protected void copyConfiguration(EventBuilderSupport<E> sourceEventBuilder) {
-    this.timestamp = sourceEventBuilder.timestamp;
-    this.host = sourceEventBuilder.host;
-    this.source = sourceEventBuilder.source;
-    this.sourcetype = sourceEventBuilder.sourcetype;
-    this.index = sourceEventBuilder.index;
+    log.debug("entering copyConfiguration - this.defaultHost = {} this.defaultIndex = {} this.defaultSource = {} this.defaultSourcetype = {} this.includedSystemProperties = {} sourceEventBuilder.defaultHost = {} sourceEventBuilder.defaultIndex = {} sourceEventBuilder.defaultSource = {} sourceEventBuilder.defaultSourcetype = {} sourceEventBuilder.includedSystemProperties = {}",
+        this.defaultHost, this.defaultIndex, this.defaultSource, this.defaultSourcetype, this.includedSystemProperties,
+        sourceEventBuilder.defaultHost, sourceEventBuilder.defaultIndex, sourceEventBuilder.defaultSource, sourceEventBuilder.defaultSourcetype, sourceEventBuilder.includedSystemProperties
+    );
+
+    this.defaultHost = sourceEventBuilder.defaultHost;
+    this.defaultIndex = sourceEventBuilder.defaultIndex;
+    this.defaultSource = sourceEventBuilder.defaultSource;
+    this.defaultSourcetype = sourceEventBuilder.defaultSourcetype;
 
     this.setIncludedSystemProperties(sourceEventBuilder.includedSystemProperties);
+
+    log.debug("leaving copyConfiguration - this.defaultHost = {} this.defaultIndex = {} this.defaultSource = {} this.defaultSourcetype = {} this.includedSystemProperties = {} sourceEventBuilder.defaultHost = {} sourceEventBuilder.defaultIndex = {} sourceEventBuilder.defaultSource = {} sourceEventBuilder.defaultSourcetype = {} sourceEventBuilder.includedSystemProperties = {}",
+        this.defaultHost, this.defaultIndex, this.defaultSource, this.defaultSourcetype, this.includedSystemProperties,
+        sourceEventBuilder.defaultHost, sourceEventBuilder.defaultIndex, sourceEventBuilder.defaultSource, sourceEventBuilder.defaultSourcetype, sourceEventBuilder.includedSystemProperties
+    );
   }
 }
