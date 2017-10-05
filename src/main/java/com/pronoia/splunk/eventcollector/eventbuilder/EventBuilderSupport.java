@@ -748,6 +748,10 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     this.sourcetype = null;
     this.timestamp = null;
     this.eventBody = null;
+
+    if (hasFields()) {
+      clearFields();
+    }
   }
 
   protected void copyConfiguration(EventBuilderSupport<E> sourceEventBuilder) {
