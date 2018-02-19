@@ -55,6 +55,6 @@ public class LoadBalancingEventCollectorClient implements EventCollectorClient {
 
   @Override
   public void sendEvent(String event) throws EventDeliveryException {
-
+    throw new UnsupportedOperationException("This class has not yet been implemented");
   }
 }
