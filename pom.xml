@@ -23,7 +23,7 @@
     <groupId>com.github.hqstevenson.splunk</groupId>
     <artifactId>splunk.httpec</artifactId>
     <packaging>bundle</packaging>
-    <version>0.5.3</version>
+    <version>1.0.0</version>
 
     <name>Splunk HTTP Event Collector Support</name>
     <description>

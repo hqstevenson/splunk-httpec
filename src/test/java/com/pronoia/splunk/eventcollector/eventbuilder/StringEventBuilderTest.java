@@ -1,12 +1,12 @@
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements. See the NOTICE file distributed with
+ * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
+ * the License.  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,64 +14,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.pronoia.splunk.eventcollector.eventbuilder;
-
-import static org.junit.Assert.assertEquals;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test the StringEventBuilder.
  */
 public class StringEventBuilderTest {
-  static final long TEST_TIMESTAMP_IN_MILLISECONDS = 1491346209382L;
-  static final double MILLISECONDS_PER_SECOND = 1000.0;
+    static final long TEST_TIMESTAMP_IN_MILLISECONDS = 1491346209382L;
+    static final double MILLISECONDS_PER_SECOND = 1000.0;
 
-  StringEventBuilder instance;
+    StringEventBuilder instance;
 
-  @Before
-  public void setUp() throws Exception {
-    instance = new StringEventBuilder();
-  }
+    @Before
+    public void setUp() throws Exception {
+        instance = new StringEventBuilder();
+    }
 
-  /**
-   * @throws Exception in the event of a test error.
-   */
-  @Test
-  public void testBuildString() throws Exception {
-    // @formatter:off
-    final String expected
-        = "{"
-        +     "\"host\":\"dummy-host\","
-        +     "\"index\":\"dummy-index\","
-        +     "\"source\":\"dummy-source\","
-        +     "\"sourcetype\":\"dummy-sourcetype\","
-        +     "\"time\":\"1491346209.382\","
-        +     "\"fields\":{"
-        +         "\"fieldOne\":\"fieldOneValue\","
-        +         "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueOne\"]"
-        +     "},"
-        +     "\"event\":\"Dummy Event Body\""
-        + "}";
-    // @formatter:on
+    /**
+     * @throws Exception in the event of a test error.
+     */
+    @Test
+    public void testBuildString() throws Exception {
+        // @formatter:off
+        final String expected
+            = "{"
+            +     "\"host\":\"dummy-host\","
+            +     "\"index\":\"dummy-index\","
+            +     "\"source\":\"dummy-source\","
+            +     "\"sourcetype\":\"dummy-sourcetype\","
+            +     "\"time\":\"1491346209.382\","
+            +     "\"fields\":{"
+            +         "\"fieldOne\":\"fieldOneValue\","
+            +         "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueOne\"]"
+            +     "},"
+            +     "\"event\":\"Dummy Event Body\""
+            + "}";
+        // @formatter:on
 
-    instance
-        .index("dummy-index")
-        .host("dummy-host")
-        .source("dummy-source")
-        .sourcetype("dummy-sourcetype")
-        .field("fieldOne", "fieldOneValue")
-        .field("fieldTwo", "fieldTwoValueOne", "fieldTwoValueOne")
-        .timestamp(TEST_TIMESTAMP_IN_MILLISECONDS / MILLISECONDS_PER_SECOND)
-        .eventBody("Dummy Event Body");
+        instance
+            .index("dummy-index")
+            .host("dummy-host")
+            .source("dummy-source")
+            .sourcetype("dummy-sourcetype")
+            .field("fieldOne", "fieldOneValue")
+            .field("fieldTwo", "fieldTwoValueOne", "fieldTwoValueOne")
+            .timestamp(TEST_TIMESTAMP_IN_MILLISECONDS / MILLISECONDS_PER_SECOND)
+            .eventBody("Dummy Event Body");
 
 
-    assertEquals(expected, instance.build());
-  }
+        assertEquals(expected, instance.build());
+    }
 
 }
