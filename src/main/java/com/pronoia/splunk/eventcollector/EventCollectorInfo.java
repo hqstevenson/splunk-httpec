@@ -28,6 +28,8 @@ public final class EventCollectorInfo {
     public static final String TIMESTAMP_KEY = "time";
     public static final String EVENT_BODY_KEY = "event";
 
+    boolean useSSL = true;
+
     String host;
     Integer port;
     String authorizationToken;
@@ -37,6 +39,14 @@ public final class EventCollectorInfo {
     String cachedAuthorizationHeaderValue;
 
     public EventCollectorInfo() {
+    }
+
+    public boolean isUseSSL() {
+        return useSSL;
+    }
+
+    public void setUseSSL(boolean useSSL) {
+        this.useSSL = useSSL;
     }
 
     /**
@@ -125,8 +135,14 @@ public final class EventCollectorInfo {
      * @return HTTP POST URL as a String
      */
     public String getPostUrl() {
+        final String postUrlFormat = "%s://%s:%d/services/collector";
+
         if (cachedPostUrl == null) {
-            cachedPostUrl = String.format("https://%s:%d/services/collector", getHost(), getPort());
+            if (isUseSSL()) {
+                cachedPostUrl = String.format("%s://%s:%d/services/collector", "https", getHost(), getPort());
+            } else {
+                cachedPostUrl = String.format("%s://%s:%d/services/collector", "http", getHost(), getPort());
+            }
         }
 
         return cachedPostUrl;

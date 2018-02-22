@@ -67,6 +67,15 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
     public SimpleEventCollectorClient() {
     }
 
+
+    public boolean isUseSSL() {
+        return eventCollectorInfo.isUseSSL();
+    }
+
+    public void setUseSSL(boolean useSSL) {
+        this.eventCollectorInfo.setUseSSL(useSSL);
+    }
+
     /**
      * Get the hostname or IP address of the Splunk HTTP Event Collector.
      *
