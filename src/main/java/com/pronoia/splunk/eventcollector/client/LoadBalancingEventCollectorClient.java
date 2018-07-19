@@ -25,9 +25,9 @@ import com.pronoia.splunk.eventcollector.EventCollectorInfo;
 import com.pronoia.splunk.eventcollector.EventDeliveryException;
 
 import org.apache.http.client.HttpClient;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Client for sending JSON-formatted events to a multiple Splunk HTTP Collectors.

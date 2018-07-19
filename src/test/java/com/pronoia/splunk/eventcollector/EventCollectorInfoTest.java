@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+
 /**
  * Test the EventCollectorInfo value object class.
  */
@@ -202,8 +203,7 @@ public class EventCollectorInfoTest {
     public void testGetPostUrl() throws Exception {
         final String expectedHost = "dummy.host.local";
         final int expectedPort = 1234;
-        String expected = String.format("https://%s:%d/services/collector",
-            expectedHost, expectedPort);
+        String expected = String.format("https://%s:%d/services/collector", expectedHost, expectedPort);
 
         instance.host = expectedHost;
         instance.port = expectedPort;

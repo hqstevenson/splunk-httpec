@@ -18,13 +18,11 @@ package com.pronoia.splunk.eventcollector.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
@@ -45,9 +43,9 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Simple Client for sending JSON-formatted events to a single Splunk HTTP
@@ -197,17 +195,14 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
     public synchronized void start() {
         if (httpClient == null) {
             HttpClientBuilder clientBuilder = HttpClients.custom();
-            clientBuilder
-                .setRetryHandler(new DefaultHttpRequestRetryHandler(RETRY_COUNT,
-                    true))
-                .setConnectionTimeToLive(CONNECTION_TIME_TO_LIVE_MILLIS, TimeUnit.MILLISECONDS);
+            clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(RETRY_COUNT,true))
+                    .setConnectionTimeToLive(CONNECTION_TIME_TO_LIVE_MILLIS, TimeUnit.MILLISECONDS);
             if (!eventCollectorInfo.isCertificateValidationEnabled()) {
-                clientBuilder
-                    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+                clientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
                 try {
                     SSLContext sslContext = new SSLContextBuilder()
-                        .loadTrustMaterial(null, new AcceptAllTrustStrategy())
-                        .build();
+                            .loadTrustMaterial(null, new AcceptAllTrustStrategy())
+                            .build();
                     clientBuilder.setSSLContext(sslContext);
                 } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException ex) {
                     throw new IllegalStateException("Failed to create SSL Context", ex);

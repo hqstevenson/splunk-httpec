@@ -19,10 +19,12 @@ package com.pronoia.splunk.eventcollector.eventbuilder;
 import com.pronoia.splunk.eventcollector.stub.JacksonEventBuilderSupportStub;
 
 import org.json.simple.JSONObject;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+
 
 /**
  * Test JSON serialization for the EventBuilderSupport class.
@@ -305,18 +307,18 @@ public class JacksonEventBuilderSupportTest {
     @Test
     public void testBuild() throws Exception {
         final String expected =
-            "{"
-            + "\"host\":\"dummy-host\","
-            + "\"index\":\"dummy-index\","
-            + "\"source\":\"dummy-source\","
-            + "\"sourcetype\":\"dummy-sourcetype\","
-            + "\"time\":\"1505323567.566\","
-            + "\"fields\":{"
-            + "\"fieldOne\":\"fieldOneValue\","
-            + "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueTwo\"]"
-            + "},"
-            + "\"event\":\"Dummy Event Body\""
-            + "}";
+                "{"
+                + "\"host\":\"dummy-host\","
+                + "\"index\":\"dummy-index\","
+                + "\"source\":\"dummy-source\","
+                + "\"sourcetype\":\"dummy-sourcetype\","
+                + "\"time\":\"1505323567.566\","
+                + "\"fields\":{"
+                + "\"fieldOne\":\"fieldOneValue\","
+                + "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueTwo\"]"
+                + "},"
+                + "\"event\":\"Dummy Event Body\""
+                + "}";
 
         instance
             .index("dummy-index")

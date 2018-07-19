@@ -25,6 +25,7 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+
 /**
  * Integration tests for the SimpleEventCollectorClient.
  */
@@ -92,24 +93,24 @@ public class SimpleEventCollectorClientIT {
         client.sendEvent(payload);
     }
 
-  /*
-  {
-  "host": "lsdiesbap01",
-  "index": "fuse-dev",
-  "sourcetype": "hl7v2-msg",
-  "source": "queue:\/\/audit.in",
-  "time": "1498858945.148",
-  "fields": {
-    "container": "activemq_ancillary_inbound",
-    "JMSPriority": "0",
-    "JMSType": "org.apache.activemq.command.ActiveMQTextMessage",
-    "JMSMessageID": "ID:lsdiesbap01-37162-1498856693513-19:1:1:1:1",
-    "JMSDestination": "queue:\/\/audit.in",
-    "JMSRedelivered": "false",
-    "JMSTimestamp": "1498858945148",
-    "JMSDeliveryMode": "2"
-  },
-  "event": "TEST MESSAGE"
-}
-   */
+    /*
+    {
+      "host": "lsdiesbap01",
+      "index": "fuse-dev",
+      "sourcetype": "hl7v2-msg",
+      "source": "queue:\/\/audit.in",
+      "time": "1498858945.148",
+      "fields": {
+        "container": "activemq_ancillary_inbound",
+        "JMSPriority": "0",
+        "JMSType": "org.apache.activemq.command.ActiveMQTextMessage",
+        "JMSMessageID": "ID:lsdiesbap01-37162-1498856693513-19:1:1:1:1",
+        "JMSDestination": "queue:\/\/audit.in",
+        "JMSRedelivered": "false",
+        "JMSTimestamp": "1498858945148",
+        "JMSDeliveryMode": "2"
+      },
+      "event": "TEST MESSAGE"
+    }
+    */
 }

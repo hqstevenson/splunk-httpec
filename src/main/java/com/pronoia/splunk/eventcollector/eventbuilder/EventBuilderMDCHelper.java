@@ -14,20 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pronoia.splunk.eventcollector.stub;
+package com.pronoia.splunk.eventcollector.eventbuilder;
 
 import com.pronoia.splunk.eventcollector.EventBuilder;
-import com.pronoia.splunk.eventcollector.eventbuilder.JacksonEventBuilderSupport;
+import com.pronoia.splunk.eventcollector.SplunkMDCHelper;
 
 
-public class JacksonEventBuilderSupportStub extends JacksonEventBuilderSupport<String> {
-    @Override
-    public EventBuilder<String> duplicate() {
-        JacksonEventBuilderSupportStub answer = new JacksonEventBuilderSupportStub();
+public class EventBuilderMDCHelper extends SplunkMDCHelper {
 
-        answer.copyConfiguration(this);
-
-        return answer;
+    public EventBuilderMDCHelper(EventBuilder<?> eventBuilder) {
+        addEventBuilderValues(eventBuilder);
     }
 
 }

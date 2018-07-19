@@ -21,6 +21,7 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Map;
 
+
 /**
  * Interface for the EventBuilder used by the HTTP Event Collector to serialize
  * events before delivering them to Splunk.
@@ -319,6 +320,21 @@ public interface EventBuilder<E> {
      *
      * <p>This value is typically the time at which the event occurred.
      *
+     * @param date value for the 'timestamp' default field.
+     */
+    default void setTimestamp(Date date) {
+        final double millisecondsPerSecond = 1000.0;
+
+        this.setTimestamp(date.getTime() / millisecondsPerSecond);
+    }
+
+
+    /**
+     * Set the value for the Splunk 'timestamp' default field that will be used
+     * on the next invocation of the build() method.
+     *
+     * <p>This value is typically the time at which the event occurred.
+     *
      * @param epochSeconds value for the 'timestamp' default field as the number of seconds since 1/1/1970 GMT.
      */
     void setTimestamp(double epochSeconds);
@@ -336,21 +352,6 @@ public interface EventBuilder<E> {
         final double millisecondsPerSecond = 1000.0;
 
         this.setTimestamp(epochMilliseconds / millisecondsPerSecond);
-    }
-
-
-    /**
-     * Set the value for the Splunk 'timestamp' default field that will be used
-     * on the next invocation of the build() method.
-     *
-     * <p>This value is typically the time at which the event occurred.
-     *
-     * @param date value for the 'timestamp' default field.
-     */
-    default void setTimestamp(Date date) {
-        final double millisecondsPerSecond = 1000.0;
-
-        this.setTimestamp(date.getTime() / millisecondsPerSecond);
     }
 
 

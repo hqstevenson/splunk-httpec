@@ -20,19 +20,20 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pronoia.splunk.eventcollector.SplunkMDCHelper;
+
 
 public abstract class JacksonEventBuilderSupport<E> extends EventBuilderSupport<E> {
     ObjectMapper jacksonObjectMapper = new ObjectMapper();
 
     @Override
     protected String convertMapToJson(Map<String, Object> map) {
-        try {
+        try (SplunkMDCHelper helper = createMdcHelper()) {
             String jsonString = jacksonObjectMapper.writeValueAsString(map);
             log.debug("Converted Map<String, Object> '{}' to JSON '{}'", map, jsonString);
             return jsonString;
         } catch (JsonProcessingException jsonProcessingEx) {
-            String errorMessage = String.format("Failed to create JSON from Map<String, Object>: %s",
-                map != null ? map.toString() : "null");
+            String errorMessage = String.format("Failed to create JSON from Map<String, Object>: %s", map != null ? map.toString() : "null");
             throw new IllegalStateException(errorMessage, jsonProcessingEx);
         }
     }

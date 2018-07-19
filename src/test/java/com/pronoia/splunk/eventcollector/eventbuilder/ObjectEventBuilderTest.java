@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+
 /**
  * Test the ObjectEventBuilder.
  */
@@ -45,18 +46,18 @@ public class ObjectEventBuilderTest {
     public void testBuildString() throws Exception {
         // @formatter:off
         final String expected
-            = "{"
-            +     "\"host\":\"dummy-host\","
-            +     "\"index\":\"dummy-index\","
-            +     "\"source\":\"dummy-source\","
-            +     "\"sourcetype\":\"dummy-sourcetype\","
-            +     "\"time\":\"1491346209.382\","
-            +     "\"fields\":{"
-            +         "\"fieldOne\":\"fieldOneValue\","
-            +         "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueOne\"]"
-            +     "},"
-            +     "\"event\":\"Dummy Event Body\""
-            + "}";
+                = "{"
+                +     "\"host\":\"dummy-host\","
+                +     "\"index\":\"dummy-index\","
+                +     "\"source\":\"dummy-source\","
+                +     "\"sourcetype\":\"dummy-sourcetype\","
+                +     "\"time\":\"1491346209.382\","
+                +     "\"fields\":{"
+                +         "\"fieldOne\":\"fieldOneValue\","
+                +         "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueOne\"]"
+                +     "},"
+                +     "\"event\":\"Dummy Event Body\""
+                + "}";
         // @formatter:on
 
         instance
@@ -80,21 +81,21 @@ public class ObjectEventBuilderTest {
     public void testBuildMap() throws Exception {
         // @formatter:off
         final String expected
-            = "{"
-            +     "\"host\":\"dummy-host\","
-            +     "\"index\":\"dummy-index\","
-            +     "\"source\":\"dummy-source\","
-            +     "\"sourcetype\":\"dummy-sourcetype\","
-            +     "\"time\":\"1491346209.382\","
-            +     "\"fields\":{"
-            +         "\"fieldOne\":\"fieldOneValue\","
-            +         "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueOne\"]"
-            +     "},"
-            +     "\"event\":{"
-            +         "\"keyOne\":\"valueOne\","
-            +         "\"keyTwo\":\"valueTwo\""
-            +     "}"
-            + "}";
+                = "{"
+                +     "\"host\":\"dummy-host\","
+                +     "\"index\":\"dummy-index\","
+                +     "\"source\":\"dummy-source\","
+                +     "\"sourcetype\":\"dummy-sourcetype\","
+                +     "\"time\":\"1491346209.382\","
+                +     "\"fields\":{"
+                +         "\"fieldOne\":\"fieldOneValue\","
+                +         "\"fieldTwo\":[\"fieldTwoValueOne\",\"fieldTwoValueOne\"]"
+                +     "},"
+                +     "\"event\":{"
+                +         "\"keyOne\":\"valueOne\","
+                +         "\"keyTwo\":\"valueTwo\""
+                +     "}"
+                + "}";
         // @formatter:on
 
         Map<String, Object> body = new LinkedHashMap<>();

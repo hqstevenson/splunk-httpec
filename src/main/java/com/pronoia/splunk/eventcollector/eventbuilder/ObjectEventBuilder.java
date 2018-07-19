@@ -18,6 +18,7 @@ package com.pronoia.splunk.eventcollector.eventbuilder;
 
 import com.pronoia.splunk.eventcollector.EventBuilder;
 
+
 /**
  * Simple implementation for using an Object as the event body.
  */
