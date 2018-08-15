@@ -34,15 +34,18 @@ import com.pronoia.splunk.eventcollector.EventDeliveryException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +60,7 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
 
     Logger log = LoggerFactory.getLogger(this.getClass());
     EventCollectorInfo eventCollectorInfo = new EventCollectorInfo();
-    HttpClient httpClient;
+    CloseableHttpClient httpClient;
 
     /**
      * Create a new EventCollectorClient.
@@ -240,7 +243,7 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
             start();
         }
 
-        HttpResponse response = null;
+        CloseableHttpResponse response = null;
         final HttpPost httpPost = new HttpPost(getPostUrl());
 
         httpPost.setHeader("Authorization", getAuthorizationHeaderValue());
@@ -249,8 +252,7 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
             response = httpClient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             if (entity != null) {
-                InputStream stream = entity.getContent();
-                stream.close();
+                EntityUtils.consume(entity);
             }
             if (response.getStatusLine().getStatusCode() != 200) {
                 log.error("Post failed with response {} for payload {}", response, event);
@@ -258,6 +260,14 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
             }
         } catch (IOException ioEx) {
             throw new EventDeliveryException(event, ioEx);
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException closeEx) {
+                    log.warn("Exception encountered closing HTTP response", closeEx);
+                }
+            }
         }
     }
 

@@ -38,7 +38,7 @@ public class SimpleEventCollectorClientIT {
         // Local Settings
         genericClient.setHost("localhost");
         genericClient.setPort(8088);
-        genericClient.setAuthorizationToken("5DA702AD-D855-4679-9CDE-A398494BE854");
+        genericClient.setAuthorizationToken("9952fa62-cef3-4509-badc-94a8f191dcb1");
         genericClient.disableCertificateValidation();
     }
 
