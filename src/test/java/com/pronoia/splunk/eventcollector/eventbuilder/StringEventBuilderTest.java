@@ -16,6 +16,9 @@
  */
 package com.pronoia.splunk.eventcollector.eventbuilder;
 
+import com.pronoia.splunk.eventcollector.EventCollectorClient;
+import com.pronoia.splunk.eventcollector.stub.EventCollectorClientStub;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,6 +29,8 @@ import static org.junit.Assert.assertEquals;
  * Test the StringEventBuilder.
  */
 public class StringEventBuilderTest {
+    EventCollectorClient clientStub = new EventCollectorClientStub();
+
     static final long TEST_TIMESTAMP_IN_MILLISECONDS = 1491346209382L;
     static final double MILLISECONDS_PER_SECOND = 1000.0;
 
@@ -68,7 +73,7 @@ public class StringEventBuilderTest {
             .eventBody("Dummy Event Body");
 
 
-        assertEquals(expected, instance.build());
+        assertEquals(expected, instance.build(clientStub));
     }
 
 }

@@ -367,6 +367,18 @@ public interface EventBuilder<E> {
         this.setTimestamp(System.currentTimeMillis() / millisecondsPerSecond);
     }
 
+    boolean hasConstantFields();
+    Map<String, String> getConstantFields();
+    Map<String, String> getConstantFields(boolean copy);
+
+    boolean hasIncludedSystemProperties();
+    Map<String, String> getIncludedSystemProperties();
+    Map<String, String> getIncludedSystemProperties(boolean copy);
+
+    boolean hasIncludedEnvironmentVariables();
+    Map<String, String> getIncludedEnvironmentVariables();
+    Map<String, String> getIncludedEnvironmentVariables(boolean copy);
+
 
     /**
      * Determine if the instance has an event configured.
@@ -664,9 +676,11 @@ public interface EventBuilder<E> {
      * Build the JSON-formatted event suitable for the Splunk HTTP Event
      * Collector.
      *
+     * @param client the event collector client
+     *
      * @return the JSON-formatted event
      */
-    String build();
+    String build(EventCollectorClient client);
 
 
     /**

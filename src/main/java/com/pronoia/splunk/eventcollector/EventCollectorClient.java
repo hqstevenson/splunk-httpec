@@ -16,11 +16,44 @@
  */
 package com.pronoia.splunk.eventcollector;
 
+import java.util.Map;
+
+
 /**
  * Client Interface for sending JSON-formatted events to the Splunk HTTP
  * Collector.
  */
 public interface EventCollectorClient {
+
+    String getClientId();
+
+    boolean hasEventHost();
+
+    String getEventHost();
+
+    boolean hasEventIndex();
+
+    String getEventIndex();
+
+    boolean hasEventSource();
+
+    String getEventSource();
+
+    boolean hasEventSourcetype();
+
+    String getEventSourcetype();
+
+    boolean hasConstantFields();
+    Map<String, String> getConstantFields();
+    Map<String, String> getConstantFields(boolean copy);
+
+    boolean hasIncludedSystemProperties();
+    Map<String, String> getIncludedSystemProperties();
+    Map<String, String> getIncludedSystemProperties(boolean copy);
+
+    boolean hasIncludedEnvironmentVariables();
+    Map<String, String> getIncludedEnvironmentVariables();
+    Map<String, String> getIncludedEnvironmentVariables(boolean copy);
 
     /**
      * Initialize the client.

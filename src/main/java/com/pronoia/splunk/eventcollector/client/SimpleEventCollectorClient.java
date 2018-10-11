@@ -16,24 +16,29 @@
  */
 package com.pronoia.splunk.eventcollector.client;
 
+import com.pronoia.splunk.eventcollector.EventDeliveryException;
+
 import java.io.IOException;
-import java.io.InputStream;
+
+import java.lang.management.ManagementFactory;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 import javax.net.ssl.SSLContext;
 
-import com.pronoia.splunk.eventcollector.EventCollectorClient;
-import com.pronoia.splunk.eventcollector.EventCollectorInfo;
-import com.pronoia.splunk.eventcollector.EventDeliveryException;
-
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -46,21 +51,25 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
  * Simple Client for sending JSON-formatted events to a single Splunk HTTP
  * Collector.
  */
-public class SimpleEventCollectorClient implements EventCollectorClient {
+public class SimpleEventCollectorClient extends AbstractEventCollectorClient implements SimpleEventCollectorClientMBean {
     static final int RETRY_COUNT = 3;
     static final long CONNECTION_TIME_TO_LIVE_MILLIS = 500;
 
-    Logger log = LoggerFactory.getLogger(this.getClass());
-    EventCollectorInfo eventCollectorInfo = new EventCollectorInfo();
     CloseableHttpClient httpClient;
+
+    ObjectName clientObjectName;
+
+    Date startTime;
+    Date lastEventTime;
+    Date stopTime;
+
+    long eventCount;
 
     /**
      * Create a new EventCollectorClient.
@@ -68,127 +77,43 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
     public SimpleEventCollectorClient() {
     }
 
-
-    public boolean isUseSSL() {
-        return eventCollectorInfo.isUseSSL();
-    }
-
-    public void setUseSSL(boolean useSSL) {
-        this.eventCollectorInfo.setUseSSL(useSSL);
-    }
-
-    /**
-     * Get the hostname or IP address of the Splunk HTTP Event Collector.
-     *
-     * @return hostname or IP
-     */
-    public String getHost() {
-        return eventCollectorInfo.getHost();
-    }
-
-    /**
-     * Set the hostname or IP address of the Splunk HTTP Event Collector.
-     *
-     * @param host hostname or IP
-     */
-    public void setHost(final String host) {
-        eventCollectorInfo.setHost(host);
-    }
-
-    /**
-     * Get the port of the Splunk HTTP Event Collector.
-     *
-     * @return port
-     */
-    public Integer getPort() {
-        return eventCollectorInfo.getPort();
-    }
-
-    /**
-     * Set the port of the Splunk HTTP Event Collector.
-     *
-     * @param port port
-     */
-    public void setPort(final Integer port) {
-        eventCollectorInfo.setPort(port);
-    }
-
-    /**
-     * Get the authorization token for Splunk HTTP Event Collector.
-     *
-     * @return the Splunk Authorization Token
-     */
-    public String getAuthorizationToken() {
-        return eventCollectorInfo.getAuthorizationToken();
-    }
-
-    /**
-     * Set the authorization token for Splunk HTTP Event Collector.
-     *
-     * @param authorizationToken the Splunk Authorization Token
-     */
-    public void setAuthorizationToken(final String authorizationToken) {
-        eventCollectorInfo.setAuthorizationToken(authorizationToken);
-    }
-
-    /**
-     * Get the URL Splunk HTTP Event Collector.
-     *
-     * @return HTTP POST URL as a String
-     */
-    public String getPostUrl() {
-        return eventCollectorInfo.getPostUrl();
-    }
-
-    /**
-     * Get the value that will be used for the HTTP Authorization header.
-     *
-     * @return HTTP Authorization header value
-     */
-    public String getAuthorizationHeaderValue() {
-        return eventCollectorInfo.getAuthorizationHeaderValue();
-    }
-
-    /**
-     * Determine if SSL certificate validation is enabled.
-     *
-     * @return true if certificate validation is enabled; false otherwise
-     */
-    public boolean isCertificateValidationEnabled() {
-        return eventCollectorInfo.isCertificateValidationEnabled();
-    }
-
-    /**
-     * Enable/Disable SSL certificate validation.
-     *
-     * @param validateCertificates if true certificate validation is enabled; otherwise certificate
-     *                             validation is disabled
-     */
-    public void setValidateCertificates(final boolean validateCertificates) {
-        eventCollectorInfo.setValidateCertificates(validateCertificates);
-    }
-
-    /**
-     * Disable SSL certificate validation.
-     */
-    public void disableCertificateValidation() {
-        eventCollectorInfo.disableCertificateValidation();
-    }
-
-    /**
-     * Enable SSL certificate validation.
-     */
-    public void enableCertificateValidation() {
-        eventCollectorInfo.enableCertificateValidation();
-    }
-
-    /**
+   /**
      * Determine if the instance has been intialized.
      *
      * @return true if the instance has been intialized; false otherwise
      */
     public boolean isInitialized() {
         return (httpClient == null) ? false : true;
+    }
+
+    @Override
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    @Override
+    public Date getLastEventTime() {
+        return lastEventTime;
+    }
+
+    @Override
+    public long getEventCount() {
+        return eventCount;
+    }
+
+    @Override
+    public Date getStopTime() {
+        return stopTime;
+    }
+
+    public synchronized void initialize() {
+        registerMBean();
+        start();
+    }
+
+    public synchronized void destroy() {
+        stop();
+        unregisterMBean();
     }
 
     /**
@@ -214,6 +139,7 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
             }
 
             httpClient = clientBuilder.build();
+            startTime = new Date();
         } else {
             log.warn("{} already initialized - ignoring 'initialize()' call", this.getClass().getSimpleName());
         }
@@ -226,9 +152,30 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
     @Override
     public synchronized void stop() {
         if (httpClient != null) {
-            httpClient = null;
+            try {
+                httpClient.close();
+            } catch (Exception closeEx) {
+                log.info("Ignoring exception encountered closing the HTTP Client", closeEx);
+            } finally {
+                httpClient = null;
+                stopTime = new Date();
+            }
         } else {
             log.warn("{} is not initialized - ignoring 'destroy()' call", this.getClass().getSimpleName());
+        }
+    }
+
+    /**
+     * Restart the HTTP Event Collector client instance.
+     */
+    @Override
+    public synchronized void restart() {
+        stop();
+        try {
+            Thread.sleep(5000);
+            start();
+        } catch (InterruptedException interruptedEx) {
+            log.warn("Restart was interrupted - consumer will not be restarted", interruptedEx);
         }
     }
 
@@ -252,12 +199,22 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
             response = httpClient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             if (entity != null) {
-                EntityUtils.consume(entity);
             }
-            if (response.getStatusLine().getStatusCode() != 200) {
-                log.error("Post failed with response {} for payload {}", response, event);
-                throw new EventDeliveryException(event, response.toString());
+            if (response.getStatusLine().getStatusCode() == 200) {
+                if (entity != null) {
+                    EntityUtils.consume(entity);
+                }
+            } else {
+                String responseBody = "<empty>";
+                if (entity != null) {
+                    responseBody = EntityUtils.toString(entity);
+                }
+                final String message = String.format("Post failed with response %s - %s for payload %s", response, responseBody, event);
+                log.error(message);
+                throw new EventDeliveryException(event, message);
             }
+            lastEventTime = new Date();
+            ++eventCount;
         } catch (IOException ioEx) {
             throw new EventDeliveryException(event, ioEx);
         } finally {
@@ -267,6 +224,42 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
                 } catch (IOException closeEx) {
                     log.warn("Exception encountered closing HTTP response", closeEx);
                 }
+            }
+        }
+    }
+
+
+    void registerMBean() {
+        String newClientObjectNameString = String.format("com.pronoia.splunk.httpec:type=%s,id=%s",
+            this.getClass().getSimpleName(), getClientId());
+
+        try {
+            clientObjectName = new ObjectName(newClientObjectNameString);
+        } catch (MalformedObjectNameException malformedNameEx) {
+            log.warn("Failed to create ObjectName for string {} - MBean will not be registered", newClientObjectNameString, malformedNameEx);
+            return;
+        }
+
+        try {
+            ManagementFactory.getPlatformMBeanServer().registerMBean(this, clientObjectName);
+        } catch (InstanceAlreadyExistsException allreadyExistsEx) {
+            log.warn("MBean already registered for name {}", clientObjectName, allreadyExistsEx);
+        } catch (MBeanRegistrationException registrationEx) {
+            log.warn("MBean registration failure for name {}", clientObjectName, registrationEx);
+        } catch (NotCompliantMBeanException nonCompliantMBeanEx) {
+            log.warn("Invalid MBean for name {}", clientObjectName, nonCompliantMBeanEx);
+        }
+
+    }
+
+    void unregisterMBean() {
+        if (clientObjectName != null) {
+            try {
+                ManagementFactory.getPlatformMBeanServer().unregisterMBean(clientObjectName);
+            } catch (InstanceNotFoundException | MBeanRegistrationException unregisterEx) {
+                log.warn("Failed to unregister consumer MBean {}", clientObjectName.getCanonicalName(), unregisterEx);
+            } finally {
+                clientObjectName = null;
             }
         }
     }
@@ -285,4 +278,6 @@ public class SimpleEventCollectorClient implements EventCollectorClient {
             return true;
         }
     }
+
+
 }

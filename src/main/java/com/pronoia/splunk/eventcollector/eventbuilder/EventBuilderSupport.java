@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,15 +16,16 @@
  */
 package com.pronoia.splunk.eventcollector.eventbuilder;
 
+import com.pronoia.splunk.eventcollector.EventBuilder;
+import com.pronoia.splunk.eventcollector.EventCollectorClient;
+import com.pronoia.splunk.eventcollector.EventCollectorInfo;
+import com.pronoia.splunk.eventcollector.SplunkMDCHelper;
+
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.pronoia.splunk.eventcollector.EventBuilder;
-import com.pronoia.splunk.eventcollector.EventCollectorInfo;
-import com.pronoia.splunk.eventcollector.SplunkMDCHelper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +45,9 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     String sourcetype;
     Double timestamp;
 
-    Map<String, String> includedSystemProperties;
     Map<String, String> constantFields;
+    Map<String, String> includedSystemProperties;
+    Map<String, String> includedEnvironmentVariables;
 
     Map<String, Object> fields;
 
@@ -57,7 +59,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
 
     @Override
     public boolean hasDefaultHost() {
-        return defaultHost != null && !defaultHost.isEmpty();
+        return checkString(defaultHost);
     }
 
     @Override
@@ -72,7 +74,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
 
     @Override
     public boolean hasDefaultIndex() {
-        return defaultIndex != null && !defaultIndex.isEmpty();
+        return checkString(defaultIndex);
     }
 
     @Override
@@ -87,7 +89,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
 
     @Override
     public boolean hasDefaultSource() {
-        return defaultSource != null && !defaultSource.isEmpty();
+        return checkString(defaultSource);
     }
 
     @Override
@@ -102,7 +104,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
 
     @Override
     public boolean hasDefaultSourcetype() {
-        return defaultSourcetype != null && !defaultSourcetype.isEmpty();
+        return checkString(defaultSourcetype);
     }
 
     @Override
@@ -122,7 +124,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
      */
     @Override
     public boolean hasHost() {
-        return host != null && !host.isEmpty();
+        return checkString(host);
     }
 
     /**
@@ -156,7 +158,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
      */
     @Override
     public boolean hasIndex() {
-        return index != null && !index.isEmpty();
+        return checkString(index);
     }
 
     /**
@@ -191,7 +193,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
      */
     @Override
     public boolean hasSource() {
-        return source != null && !source.isEmpty();
+        return checkString(source);
     }
 
     /**
@@ -225,7 +227,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
      */
     @Override
     public boolean hasSourcetype() {
-        return sourcetype != null && !sourcetype.isEmpty();
+        return checkString(sourcetype);
     }
 
     /**
@@ -287,6 +289,86 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     }
 
     /**
+     * Determine if the instance has constant Splunk fields configured.
+     *
+     * @return true if constant Splunk fields are configured; false otherwise
+     */
+    @Override
+    public boolean hasConstantFields() {
+        return checkMap(constantFields);
+    }
+
+    /**
+     * Get a copy of the constant Splunk fields and values that will be included in the event.
+     *
+     * @return a copy of the included system properties Map
+     */
+    @Override
+    public Map<String, String> getConstantFields() {
+        return getConstantFields(true);
+    }
+
+    /**
+     * Get a copy of the constant Splunk fields and values that will be included in the event.
+     *
+     * @return a copy of the included system properties Map
+     */
+    @Override
+    public Map<String, String> getConstantFields(boolean copy) {
+        return copy ? createCopyOfMap(constantFields) : constantFields;
+    }
+
+    @Override
+    public boolean hasIncludedSystemProperties() {
+        return checkMap(includedSystemProperties);
+    }
+
+    /**
+     * Get a copy of the system properties and their associated Splunk field names that will be included in the event.
+     *
+     * @return a copy of the included system properties Map
+     */
+    @Override
+    public Map<String, String> getIncludedSystemProperties() {
+        return getIncludedSystemProperties(true);
+    }
+
+    /**
+     * Get a copy of the system properties and their associated Splunk field names that will be included in the event.
+     *
+     * @return a copy of the included system properties Map
+     */
+    @Override
+    public Map<String, String> getIncludedSystemProperties(boolean copy) {
+        return copy ? createCopyOfMap(includedSystemProperties) : includedSystemProperties;
+    }
+
+    @Override
+    public boolean hasIncludedEnvironmentVariables() {
+        return checkMap(includedEnvironmentVariables);
+    }
+
+    /**
+     * Get a copy of the environment variables and their associated Splunk field names that will be included in the event.
+     *
+     * @return a copy of the included environment variable Map
+     */
+    @Override
+    public Map<String, String> getIncludedEnvironmentVariables() {
+        return getIncludedEnvironmentVariables(true);
+    }
+
+    /**
+     * Get the environment variables and their associated Splunk field names that will be included in the event, optionally copying the Map.
+     *
+     * @return a copy of the included environment variable Map
+     */
+    @Override
+    public Map<String, String> getIncludedEnvironmentVariables(boolean copy) {
+        return copy ? createCopyOfMap(includedEnvironmentVariables) : includedEnvironmentVariables;
+    }
+
+    /**
      * Determine if the instance has an event configured.
      *
      * @return true if an event has been configured; false otherwise
@@ -323,7 +405,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
      */
     @Override
     public boolean hasFields() {
-        return fields != null && !fields.isEmpty();
+        return checkMap(fields);
     }
 
     /**
@@ -378,21 +460,21 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
                     fields.remove(fieldName);
                 } else {
                     switch (fieldValues.length) {
-                        case 0:
-                            // Remove the empty field
+                    case 0:
+                        // Remove the empty field
+                        fields.remove(fieldName);
+                        break;
+                    case 1:
+                        if (fieldValues[0] == null || fieldValues[0].isEmpty()) {
                             fields.remove(fieldName);
-                            break;
-                        case 1:
-                            if (fieldValues[0] == null || fieldValues[0].isEmpty()) {
-                                fields.remove(fieldName);
-                            } else {
-                                // Add a single String
-                                fields.put(fieldName, fieldValues[0]);
-                            }
-                            break;
-                        default:
-                            // Add all values
-                            fields.put(fieldName, Arrays.asList(fieldValues));
+                        } else {
+                            // Add a single String
+                            fields.put(fieldName, fieldValues[0]);
+                        }
+                        break;
+                    default:
+                        // Add all values
+                        fields.put(fieldName, Arrays.asList(fieldValues));
                     }
                 }
             }
@@ -454,13 +536,13 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
      * @return the JSON-formatted event
      */
     @Override
-    public String build() {
+    public String build(EventCollectorClient client) {
         Map<String, Object> eventMap = new LinkedHashMap<>();
 
-        addDefaultFieldsToMap(eventMap);
+        addDefaultFieldsToMap(client, eventMap);
 
         Map<String, Object> additionalFields = new LinkedHashMap<>();
-        addAdditionalFieldsToMap(additionalFields);
+        addAdditionalFieldsToMap(client, additionalFields);
         if (!additionalFields.isEmpty()) {
             eventMap.put(EventCollectorInfo.FIELDS_KEY, additionalFields);
         }
@@ -474,25 +556,64 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
         return answer;
     }
 
-    protected abstract String convertMapToJson(Map<String, Object> map);
+    /**
+     * Set the environment variables and their associated Splunk field names to include in the event.
+     *
+     * @param environmentVariables a Map of environment variables and their associated Splunk field names.
+     */
+    public void setIncludedEnvironmentVariables(Map<String, String> environmentVariables) {
+        if (includedEnvironmentVariables == null) {
+            includedEnvironmentVariables = new TreeMap<>();
+        } else {
+            includedEnvironmentVariables.clear();
+        }
 
-    public boolean hasIncludedSystemProperties() {
-        return includedSystemProperties != null && !includedSystemProperties.isEmpty();
+        addIncludedEnvironmentVariables(environmentVariables);
     }
 
     /**
-     * Get a copy of the system properties and their associated Splunk field names that will be included in the event.
+     * Set the system properties and their associated Splunk field names to include in the event.
      *
-     * @return a copy of the included system properties Map
+     * @param systemProperties a Map of system property keys and their associated Splunk field names.
      */
-    public Map<String, String> getIncludedSystemProperties() {
-        Map<String, String> answer = new TreeMap<>();
-
-        if (hasIncludedSystemProperties()) {
-            answer.putAll(includedSystemProperties);
+    public void setIncludedSystemProperties(Map<String, String> systemProperties) {
+        if (includedSystemProperties == null) {
+            includedSystemProperties = new TreeMap<>();
+        } else {
+            includedSystemProperties.clear();
         }
 
-        return answer;
+        addIncludedSystemProperties(systemProperties);
+    }
+
+    /**
+     * Set the constant Splunk fields values to include in the event.
+     *
+     * @param constantFields a Map of Splunk field names and their associated values.
+     */
+    public void setConstantFields(Map<String, String> constantFields) {
+        if (this.constantFields == null) {
+            this.constantFields = new TreeMap<>();
+        } else {
+            this.constantFields.clear();
+        }
+
+        addConstantFields(constantFields);
+    }
+
+    /**
+     * Set the environment variables to include in the event.
+     *
+     * @param environmentVariables a List of environment variables
+     */
+    public void setIncludedEnvironmentVariables(List<String> environmentVariables) {
+        if (includedEnvironmentVariables == null) {
+            includedEnvironmentVariables = new TreeMap<>();
+        } else {
+            includedEnvironmentVariables.clear();
+        }
+
+        addIncludedEnvironmentVariables(environmentVariables);
     }
 
     /**
@@ -510,19 +631,45 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
         addIncludedSystemProperties(systemProperties);
     }
 
+    protected abstract String convertMapToJson(Map<String, Object> map);
+
     /**
-     * Set the system properties and their associated Splunk field names to include in the event.
+     * Add constant Splunk fields and their associated values to the current set of constant Splunk fields to include in the event.
      *
-     * @param systemProperties a Map of system property keys and their associated Splunk field names.
+     * @param constantFields a Map of Splunk field names and their associated values.
      */
-    public void setIncludedSystemProperties(Map<String, String> systemProperties) {
-        if (includedSystemProperties == null) {
-            includedSystemProperties = new TreeMap<>();
-        } else {
-            includedSystemProperties.clear();
+    public void addConstantFields(Map<String, String> constantFields) {
+        if (this.constantFields == null) {
+            this.constantFields = new TreeMap<>();
+        }
+        if (constantFields != null && !constantFields.isEmpty()) {
+            this.constantFields.putAll(constantFields);
+        }
+    }
+
+    /**
+     * Add a constant Splunk field and value to the current set of constant Splunk fields to include in the event.
+     *
+     * @param splunkFieldName the Splunk field name
+     * @param splunkFieldValue the value for the field
+     */
+    public void addConstantField(String splunkFieldName, String splunkFieldValue) {
+        if (this.constantFields == null) {
+            this.constantFields = new TreeMap<>();
         }
 
-        addIncludedSystemProperties(systemProperties);
+        this.constantFields.put(splunkFieldName, splunkFieldValue);
+    }
+
+    /**
+     * Remove a constant Splunk field from the current set of constant Splunk fields to include in the event.
+     *
+     * @param splunkFieldName the Splunk field name
+     */
+    public void removeConstantField(String splunkFieldName) {
+        if (this.constantFields != null) {
+            this.constantFields.remove(splunkFieldName);
+        }
     }
 
     /**
@@ -558,7 +705,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     /**
      * Add a system properties and it's associated Splunk field name to the current set of system properties to include in the event.
      *
-     * @param systemProperty a system property key
+     * @param systemProperty  a system property key
      * @param splunkFieldName the Splunk field name for the system property
      */
     public void includeSystemProperty(String systemProperty, String splunkFieldName) {
@@ -598,94 +745,82 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     }
 
     /**
-     * Determine if the instance has constant Splunk fields configured.
+     * Add environment variables and their associated Splunk field names to the current set of system properties to include in the event.
      *
-     * @return true if constant Splunk fields are configured; false otherwise
+     * @param environmentVariables a Map of environment variables and their associated Splunk field names.
      */
-    public boolean hasConstantFields() {
-        return constantFields != null && !constantFields.isEmpty();
+    public void addIncludedEnvironmentVariables(Map<String, String> environmentVariables) {
+        if (includedEnvironmentVariables == null) {
+            includedEnvironmentVariables = new TreeMap<>();
+        }
+        if (environmentVariables != null && !environmentVariables.isEmpty()) {
+            environmentVariables.putAll(environmentVariables);
+        }
     }
 
     /**
-     * Get a copy of the constant Splunk fields and values that will be included in the event.
+     * Add environment variables to the current set of environment variables to include in the event.
      *
-     * @return a copy of the included system properties Map
+     * @param environmentVariables a List of environment variables
      */
-    public Map<String, String> getConstantFields() {
-        Map<String, String> answer = new TreeMap<>();
+    public void addIncludedEnvironmentVariables(List<String> environmentVariables) {
+        if (includedEnvironmentVariables == null) {
+            includedEnvironmentVariables = new TreeMap<>();
+        }
+        if (environmentVariables != null && !environmentVariables.isEmpty()) {
+            for (String environmentVariable : environmentVariables) {
+                includeEnvironmentVariable(environmentVariable);
+            }
+        }
+    }
 
-        if (hasConstantFields()) {
-            answer.putAll(constantFields);
+    /**
+     * Add an environment variable and it's associated Splunk field name to the current set of environment variables to include in the event.
+     *
+     * @param environmentVariable an environment variable
+     * @param splunkFieldName     the Splunk field name for the environment variable
+     */
+    public void includeEnvironmentVariable(String environmentVariable, String splunkFieldName) {
+        if (includedEnvironmentVariables == null) {
+            includedEnvironmentVariables = new TreeMap<>();
         }
 
-        return answer;
-    }
-
-    /**
-     * Set the constant Splunk fields values to include in the event.
-     *
-     * @param constantFields a Map of Splunk field names and their associated values.
-     */
-    public void setConstantFields(Map<String, String> constantFields) {
-        if (this.constantFields == null) {
-            this.constantFields = new TreeMap<>();
+        if (splunkFieldName != null && !splunkFieldName.isEmpty()) {
+            includedEnvironmentVariables.put(environmentVariable, splunkFieldName);
         } else {
-            this.constantFields.clear();
-        }
-
-        addConstantFields(constantFields);
-    }
-
-    /**
-     * Add constant Splunk fields and their associated values to the current set of constant Splunk fields to include in the event.
-     *
-     * @param constantFields a Map of Splunk field names and their associated values.
-     */
-    public void addConstantFields(Map<String, String> constantFields) {
-        if (this.constantFields == null) {
-            this.constantFields = new TreeMap<>();
-        }
-        if (constantFields != null && !constantFields.isEmpty()) {
-            this.constantFields.putAll(constantFields);
+            includedEnvironmentVariables.put(environmentVariable, null);
         }
     }
 
     /**
-     * Add a constant Splunk field and value to the current set of constant Splunk fields to include in the event.
+     * Add an environment variable to the current set of environment variables to include in the event.
      *
-     * @param splunkFieldName the Splunk field name
+     * @param environmentVariable an environment variable
      */
-    public void addConstantField(String splunkFieldName, String splunkFieldValue) {
-        if (this.constantFields == null) {
-            this.constantFields = new TreeMap<>();
+    public void includeEnvironmentVariable(String environmentVariable) {
+        if (includedEnvironmentVariables == null) {
+            includedEnvironmentVariables = new TreeMap<>();
         }
 
-        this.constantFields.put(splunkFieldName, splunkFieldValue);
-    }
-
-    /**
-     * Remove a constant Splunk field from the current set of constant Splunk fields to include in the event.
-     *
-     * @param splunkFieldName the Splunk field name
-     */
-    public void removeConstantField(String splunkFieldName) {
-        if (this.constantFields != null) {
-            this.constantFields.remove(splunkFieldName);
-        }
+        includedEnvironmentVariables.put(environmentVariable, null);
     }
 
     /**
      * Determine the value for the Splunk host field.
      *
+     * @param client the event collector client
+     *
      * @return the value for the Splunk host field, or null if the Splunk host field should NOT be included in the event.
      */
-    public String getHostFieldValue() {
+    public String getHostFieldValue(EventCollectorClient client) {
         String answer = null;
 
         if (hasHost()) {
             answer = host;
         } else if (hasDefaultHost()) {
             answer = defaultHost;
+        } else if (client.hasEventHost()) {
+            answer = client.getEventHost();
         }
 
         return answer;
@@ -694,15 +829,19 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     /**
      * Determine the value for the Splunk index field.
      *
+     * @param client the event collector client
+     *
      * @return the value for the Splunk index field, or null if Splunk index field should NOT be included in the event.
      */
-    public String getIndexFieldValue() {
+    public String getIndexFieldValue(EventCollectorClient client) {
         String answer = null;
 
         if (hasIndex()) {
             answer = index;
         } else if (hasDefaultIndex()) {
             answer = defaultIndex;
+        } else if (client.hasEventIndex()) {
+            answer = client.getEventIndex();
         }
 
         return answer;
@@ -711,15 +850,19 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     /**
      * Determine the value for the Splunk source field.
      *
+     * @param client the event collector client
+     *
      * @return the value for the Splunk source field, or null if Splunk source field should NOT be included in the event.
      */
-    public String getSourceFieldValue() {
+    public String getSourceFieldValue(EventCollectorClient client) {
         String answer = null;
 
         if (hasSource()) {
             answer = source;
         } else if (hasDefaultSource()) {
             answer = defaultSource;
+        } else if (client.hasEventSource()) {
+            answer = client.getEventSource();
         }
 
         return answer;
@@ -728,15 +871,19 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     /**
      * Determine the value for the Splunk sourcetype field.
      *
+     * @param client the event collector client
+     *
      * @return the value for the Splunk sourcetype field, or null if Splunk sourcetype field should NOT be included in the event.
      */
-    public String getSourcetypeFieldValue() {
+    public String getSourcetypeFieldValue(EventCollectorClient client) {
         String answer = null;
 
         if (hasSourcetype()) {
             answer = sourcetype;
         } else if (hasDefaultSourcetype()) {
             answer = defaultSourcetype;
+        } else if (client.hasEventSourcetype()) {
+            answer = client.getEventSourcetype();
         }
 
         return answer;
@@ -765,32 +912,33 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
      *
      * <p>This method is called by the 'build' method.
      *
+     * @param client the event collector client
      * @param map the target Map for the field values
      */
-    protected void addDefaultFieldsToMap(Map<String, Object> map) {
+    protected void addDefaultFieldsToMap(EventCollectorClient client, Map<String, Object> map) {
         try (SplunkMDCHelper helper = createMdcHelper()) {
 
             log.debug("Adding default event fields");
 
-            String hostFieldValue = getHostFieldValue();
+            String hostFieldValue = getHostFieldValue(client);
             if (hostFieldValue != null && !hostFieldValue.isEmpty()) {
                 log.debug("Adding '{}'={}", EventCollectorInfo.HOST_KEY, hostFieldValue);
                 map.put(EventCollectorInfo.HOST_KEY, hostFieldValue);
             }
 
-            String indexFieldValue = getIndexFieldValue();
+            String indexFieldValue = getIndexFieldValue(client);
             if (indexFieldValue != null && !indexFieldValue.isEmpty()) {
                 log.debug("Adding '{}'={}", EventCollectorInfo.INDEX_KEY, indexFieldValue);
                 map.put(EventCollectorInfo.INDEX_KEY, indexFieldValue);
             }
 
-            String sourceFieldValue = getSourceFieldValue();
+            String sourceFieldValue = getSourceFieldValue(client);
             if (sourceFieldValue != null && !sourceFieldValue.isEmpty()) {
                 log.debug("Adding '{}'={}", EventCollectorInfo.SOURCE_KEY, sourceFieldValue);
                 map.put(EventCollectorInfo.SOURCE_KEY, sourceFieldValue);
             }
 
-            String sourcetypeFieldValue = getSourcetypeFieldValue();
+            String sourcetypeFieldValue = getSourcetypeFieldValue(client);
             if (sourcetypeFieldValue != null && !sourcetypeFieldValue.isEmpty()) {
                 log.debug("Adding '{}'={}", EventCollectorInfo.SOURCETYPE_KEY, sourcetypeFieldValue);
                 map.put(EventCollectorInfo.SOURCETYPE_KEY, sourcetypeFieldValue);
@@ -809,11 +957,24 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
      *
      * <p>This method is called by the 'build' method.
      *
+     * @param client the event collector client
      * @param map the target Map for the field values
      */
-    protected void addAdditionalFieldsToMap(Map<String, Object> map) {
+    protected void addAdditionalFieldsToMap(EventCollectorClient client, Map<String, Object> map) {
         try (SplunkMDCHelper helper = createMdcHelper()) {
             log.debug("Adding additional event fields");
+
+            if (client.hasIncludedEnvironmentVariables()) {
+                addEnvironmentVariablesToMap(client, map);
+            }
+
+            if (hasIncludedEnvironmentVariables()) {
+                addEnvironmentVariablesToMap(map);
+            }
+
+            if (client.hasIncludedSystemProperties()) {
+                addSystemPropertiesToMap(client, map);
+            }
 
             if (hasIncludedSystemProperties()) {
                 addSystemPropertiesToMap(map);
@@ -823,8 +984,85 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
                 map.putAll(fields);
             }
 
+            if (client.hasConstantFields()) {
+                addConstantFieldsToMap(client, map);
+            }
+
             if (hasConstantFields()) {
                 addConstantFieldsToMap(map);
+            }
+        }
+    }
+
+    /**
+     * Add the constant Splunk fields to the event.
+     *
+     * <p>This method is called by the 'build' method.
+     *
+     * @param client the Splunk client with constant fields
+     * @param map    the target Map for the constant field values
+     */
+    protected void addConstantFieldsToMap(EventCollectorClient client, Map<String, Object> map) {
+        if (map != null && client != null && client.hasConstantFields()) {
+            try (SplunkMDCHelper helper = createMdcHelper()) {
+                log.debug("Adding constant Splunk fields from event collector client to event");
+
+                doAddConstantFieldsToMap(client.getConstantFields(false), map);
+            }
+        }
+    }
+
+    /**
+     * Add the constant Splunk fields to the event.
+     *
+     * <p>This method is called by the 'build' method.
+     *
+     * @param map the target Map for the constant field values
+     */
+    protected void addConstantFieldsToMap(Map<String, Object> map) {
+        if (map != null && hasConstantFields()) {
+            try (SplunkMDCHelper helper = createMdcHelper()) {
+                log.debug("Adding constant Splunk fields from event builder to event");
+
+                doAddConstantFieldsToMap(constantFields, map);
+            }
+        }
+    }
+
+    /**
+     * Add the constant Splunk fields to the event.
+     *
+     * <p>This method is called by the 'build' method.
+     *
+     * @param constantFieldsSource the source map of constand fields and their values
+     * @param target               the target Map for the system property values
+     */
+    protected void doAddConstantFieldsToMap(Map<String, String> constantFieldsSource, Map<String, Object> target) {
+        if (target != null && constantFieldsSource != null && !constantFieldsSource.isEmpty()) {
+            for (Map.Entry<String, String> constantField : constantFieldsSource.entrySet()) {
+                String splunkFieldName = constantField.getKey();
+                String splunkFieldValue = constantField.getValue();
+                if (splunkFieldName != null && splunkFieldValue != null && !splunkFieldName.isEmpty() && !splunkFieldValue.isEmpty()) {
+                    target.put(splunkFieldName, splunkFieldValue);
+                }
+            }
+        }
+    }
+
+    /**
+     * Add the system properties to the event.
+     *
+     * <p>This method is called by the 'build' method.
+     *
+     * @param client the Splunk client with system properties
+     * @param map    the target Map for the system property values
+     */
+    protected void addSystemPropertiesToMap(EventCollectorClient client, Map<String, Object> map) {
+        if (map != null && client.hasIncludedSystemProperties()) {
+            try (SplunkMDCHelper helper = createMdcHelper()) {
+                log.debug("Adding system properties from the event collector client to the event");
+
+                doAddSystemPropertiesToMap(client.getIncludedSystemProperties(false), map);
             }
         }
     }
@@ -837,22 +1075,35 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
      * @param map the target Map for the system property values
      */
     protected void addSystemPropertiesToMap(Map<String, Object> map) {
-        try (SplunkMDCHelper helper = createMdcHelper()) {
-            log.debug("Adding system properties to the event");
+        if (map != null && hasIncludedSystemProperties()) {
+            try (SplunkMDCHelper helper = createMdcHelper()) {
+                log.debug("Adding system properties from the event builder to the event");
+                doAddSystemPropertiesToMap(includedSystemProperties, map);
+            }
+        }
+    }
 
-            if (map != null && hasIncludedSystemProperties()) {
-                for (Map.Entry<String, String> systemPropertyEntry : includedSystemProperties.entrySet()) {
-                    String systemPropertyName = systemPropertyEntry.getKey();
-                    if (systemPropertyName != null || !systemPropertyName.isEmpty()) {
-                        String systemPropertyValue = System.getProperty(systemPropertyName, null);
-                        if (systemPropertyValue != null && !systemPropertyValue.isEmpty()) {
-                            String splunkFieldName = systemPropertyEntry.getValue();
-                            if (splunkFieldName == null || splunkFieldName.isEmpty()) {
-                                splunkFieldName = systemPropertyName;
-                                systemPropertyEntry.setValue(systemPropertyName);
-                            }
-                            map.put(splunkFieldName, systemPropertyValue);
+    /**
+     * Add the system properties to the event.
+     *
+     * <p>This method is called by the 'build' method.
+     *
+     * @param systemPropertiesSource the source map of system properties and their associated field names
+     * @param target                 the target Map for the system property values
+     */
+    protected void doAddSystemPropertiesToMap(Map<String, String> systemPropertiesSource, Map<String, Object> target) {
+        if (target != null && systemPropertiesSource != null && !systemPropertiesSource.isEmpty()) {
+            for (Map.Entry<String, String> systemPropertyEntry : systemPropertiesSource.entrySet()) {
+                String systemPropertyName = systemPropertyEntry.getKey();
+                if (systemPropertyName != null || !systemPropertyName.isEmpty()) {
+                    String systemPropertyValue = System.getProperty(systemPropertyName, null);
+                    if (systemPropertyValue != null && !systemPropertyValue.isEmpty()) {
+                        String splunkFieldName = systemPropertyEntry.getValue();
+                        if (splunkFieldName == null || splunkFieldName.isEmpty()) {
+                            splunkFieldName = systemPropertyName;
+                            systemPropertyEntry.setValue(systemPropertyName);
                         }
+                        target.put(splunkFieldName, systemPropertyValue);
                     }
                 }
             }
@@ -860,22 +1111,63 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
     }
 
     /**
-     * Add the constant Splunk fields to the event.
+     * Add the environment variables to the event.
      *
      * <p>This method is called by the 'build' method.
      *
-     * @param map the target Map for the system property values
+     * @param client the Splunk client with environment variables
+     * @param map    the target Map for the environment variable values
      */
-    protected void addConstantFieldsToMap(Map<String, Object> map) {
-        try (SplunkMDCHelper helper = createMdcHelper()) {
-            log.debug("Adding constant Splunk fields to event");
+    protected void addEnvironmentVariablesToMap(EventCollectorClient client, Map<String, Object> map) {
+        if (map != null && client.hasIncludedEnvironmentVariables()) {
+            try (SplunkMDCHelper helper = createMdcHelper()) {
+                log.debug("Adding environment variables from the event collector client to the event");
+                doAddEnvironmentVariablesToMap(client.getIncludedEnvironmentVariables(false), map);
+            }
+        }
+    }
 
-            if (map != null && hasConstantFields()) {
-                for (Map.Entry<String, String> constantField : constantFields.entrySet()) {
-                    String splunkFieldName = constantField.getKey();
-                    String splunkFieldValue = constantField.getValue();
-                    if (splunkFieldName != null && splunkFieldValue != null && !splunkFieldName.isEmpty() && !splunkFieldValue.isEmpty()) {
-                        map.put(splunkFieldName, splunkFieldValue);
+    /**
+     * Add the environment variables to the event.
+     *
+     * <p>This method is called by the 'build' method.
+     *
+     * @param map the target Map for the environment variable values
+     */
+    protected void addEnvironmentVariablesToMap(Map<String, Object> map) {
+        if (map != null && hasIncludedEnvironmentVariables()) {
+            try (SplunkMDCHelper helper = createMdcHelper()) {
+                log.debug("Adding environment variables from the event builder to the event");
+                doAddEnvironmentVariablesToMap(includedEnvironmentVariables, map);
+            }
+        }
+    }
+
+    /**
+     * Add the environment variables to the event.
+     *
+     * <p>This method is called by the 'build' method.
+     *
+     * @param environmentVariblesSource the source map of environment variables and their associated field names
+     * @param target                    the target Map for the environment variable values
+     */
+    protected void doAddEnvironmentVariablesToMap(Map<String, String> environmentVariblesSource, Map<String, Object> target) {
+        try (SplunkMDCHelper helper = createMdcHelper()) {
+            log.debug("Adding system properties to the event");
+
+            if (target != null && environmentVariblesSource != null && !environmentVariblesSource.isEmpty()) {
+                for (Map.Entry<String, String> environmentVariableEntry : environmentVariblesSource.entrySet()) {
+                    String environmentVariableName = environmentVariableEntry.getKey();
+                    if (environmentVariableName != null || !environmentVariableName.isEmpty()) {
+                        String environmentVariableValue = System.getenv(environmentVariableName);
+                        if (environmentVariableValue != null && !environmentVariableValue.isEmpty()) {
+                            String splunkFieldName = environmentVariableEntry.getValue();
+                            if (splunkFieldName == null || splunkFieldName.isEmpty()) {
+                                splunkFieldName = environmentVariableName;
+                                environmentVariableEntry.setValue(environmentVariableName);
+                            }
+                            target.put(splunkFieldName, environmentVariableValue);
+                        }
                     }
                 }
             }
@@ -948,8 +1240,9 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
             this.defaultSource = sourceEventBuilder.defaultSource;
             this.defaultSourcetype = sourceEventBuilder.defaultSourcetype;
 
-            this.setIncludedSystemProperties(sourceEventBuilder.includedSystemProperties);
             this.setConstantFields(sourceEventBuilder.constantFields);
+            this.setIncludedSystemProperties(sourceEventBuilder.includedSystemProperties);
+            this.setIncludedEnvironmentVariables(sourceEventBuilder.includedEnvironmentVariables);
         }
     }
 
@@ -1012,6 +1305,25 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
         builder.append('}');
 
         return builder.toString();
+    }
+
+    protected boolean checkString(String str) {
+        return str != null && !str.isEmpty();
+    }
+
+
+    protected boolean checkMap(Map map) {
+        return map != null && !map.isEmpty();
+    }
+
+    protected Map<String, String> createCopyOfMap(Map<String, String> src) {
+        Map<String, String> answer = new TreeMap<>();
+
+        if (src != null && !src.isEmpty()) {
+            answer.putAll(src);
+        }
+
+        return answer;
     }
 
 }

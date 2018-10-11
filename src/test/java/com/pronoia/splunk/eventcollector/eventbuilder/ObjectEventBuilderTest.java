@@ -16,6 +16,9 @@
  */
 package com.pronoia.splunk.eventcollector.eventbuilder;
 
+import com.pronoia.splunk.eventcollector.EventCollectorClient;
+import com.pronoia.splunk.eventcollector.stub.EventCollectorClientStub;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,6 +35,7 @@ public class ObjectEventBuilderTest {
     static final long TEST_TIMESTAMP_IN_MILLISECONDS = 1491346209382L;
     static final double MILLISECONDS_PER_SECOND = 1000.0;
 
+    EventCollectorClient clientStub = new EventCollectorClientStub();
     ObjectEventBuilder instance;
 
     @Before
@@ -71,7 +75,7 @@ public class ObjectEventBuilderTest {
             .eventBody("Dummy Event Body");
 
 
-        assertEquals(expected, instance.build());
+        assertEquals(expected, instance.build(clientStub));
     }
 
     /**
@@ -114,6 +118,6 @@ public class ObjectEventBuilderTest {
         instance.eventBody(body);
 
 
-        assertEquals(expected, instance.build());
+        assertEquals(expected, instance.build(clientStub));
     }
 }

@@ -19,6 +19,7 @@ package com.pronoia.splunk.eventcollector.client;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.pronoia.splunk.eventcollector.EventCollectorClient;
 import com.pronoia.splunk.eventcollector.EventCollectorInfo;
@@ -40,6 +41,96 @@ public class LoadBalancingEventCollectorClient implements EventCollectorClient {
     Deque<HttpClient> httpClients;
 
     public LoadBalancingEventCollectorClient() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public String getClientId() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public boolean hasEventHost() {
+        return false;
+    }
+
+    @Override
+    public String getEventHost() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public boolean hasEventIndex() {
+        return false;
+    }
+
+    @Override
+    public String getEventIndex() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public boolean hasEventSource() {
+        return false;
+    }
+
+    @Override
+    public String getEventSource() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public boolean hasEventSourcetype() {
+        return false;
+    }
+
+    @Override
+    public String getEventSourcetype() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public boolean hasConstantFields() {
+        return false;
+    }
+
+    @Override
+    public Map<String, String> getConstantFields() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public Map<String, String> getConstantFields(boolean copy) {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public boolean hasIncludedSystemProperties() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public Map<String, String> getIncludedSystemProperties() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public Map<String, String> getIncludedSystemProperties(boolean copy) {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public boolean hasIncludedEnvironmentVariables() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public Map<String, String> getIncludedEnvironmentVariables() {
+        throw new UnsupportedOperationException("This class has not yet been implemented");
+    }
+
+    @Override
+    public Map<String, String> getIncludedEnvironmentVariables(boolean copy) {
         throw new UnsupportedOperationException("This class has not yet been implemented");
     }
 

@@ -16,6 +16,8 @@
  */
 package com.pronoia.splunk.eventcollector.eventbuilder;
 
+import com.pronoia.splunk.eventcollector.EventCollectorClient;
+import com.pronoia.splunk.eventcollector.stub.EventCollectorClientStub;
 import com.pronoia.splunk.eventcollector.stub.JacksonEventBuilderSupportStub;
 
 import org.json.simple.JSONObject;
@@ -30,6 +32,8 @@ import static org.junit.Assert.assertEquals;
  * Test JSON serialization for the EventBuilderSupport class.
  */
 public class JacksonEventBuilderSupportTest {
+    EventCollectorClient clientStub = new EventCollectorClientStub();
+
     JacksonEventBuilderSupport<String> instance;
 
     Double timestamp = 1505323567.566;
@@ -55,7 +59,7 @@ public class JacksonEventBuilderSupportTest {
 
         instance.index("dummy-index");
 
-        instance.addDefaultFieldsToMap(tmpObject);
+        instance.addDefaultFieldsToMap(clientStub, tmpObject);
 
         assertEquals(expected, tmpObject.toJSONString());
     }
@@ -69,7 +73,7 @@ public class JacksonEventBuilderSupportTest {
 
         instance.host("dummy-host");
 
-        instance.addDefaultFieldsToMap(tmpObject);
+        instance.addDefaultFieldsToMap(clientStub, tmpObject);
 
         assertEquals("{\"host\":\"dummy-host\",\"time\":\"1505323567.566\"}", tmpObject.toJSONString());
     }
@@ -89,7 +93,7 @@ public class JacksonEventBuilderSupportTest {
 
         instance.source("dummy-source");
 
-        instance.addDefaultFieldsToMap(tmpObject);
+        instance.addDefaultFieldsToMap(clientStub, tmpObject);
 
         assertEquals(expected, tmpObject.toJSONString());
     }
@@ -109,7 +113,7 @@ public class JacksonEventBuilderSupportTest {
 
         instance.sourcetype("dummy-sourcetype");
 
-        instance.addDefaultFieldsToMap(tmpObject);
+        instance.addDefaultFieldsToMap(clientStub, tmpObject);
 
         assertEquals(expected, tmpObject.toJSONString());
     }
@@ -133,7 +137,7 @@ public class JacksonEventBuilderSupportTest {
             .field("fieldOne", "fieldOneValueOne")
             .field("fieldTwo", "fieldTwoValueOne");
 
-        assertEquals(expected, instance.build());
+        assertEquals(expected, instance.build(clientStub));
     }
 
     /**
@@ -155,7 +159,7 @@ public class JacksonEventBuilderSupportTest {
             .field("fieldOne", "fieldOneValueOne", "fieldOneValueTwo")
             .field("fieldTwo", "fieldTwoValueOne", "fieldTwoValueTwo");
 
-        assertEquals(expected, instance.build());
+        assertEquals(expected, instance.build(clientStub));
     }
 
     /**
@@ -174,7 +178,7 @@ public class JacksonEventBuilderSupportTest {
 
         instance.timestamp(testTimestampInMilliseconds / millisecondsPerSecond);
 
-        assertEquals(expected, instance.build());
+        assertEquals(expected, instance.build(clientStub));
     }
 
     /**
@@ -200,7 +204,7 @@ public class JacksonEventBuilderSupportTest {
             .field("fieldOne", "fieldOneValue")
             .field("fieldTwo", "fieldTwoValueOne", "fieldTwoValueTwo");
 
-        assertEquals(expected, instance.build());
+        assertEquals(expected, instance.build(clientStub));
     }
 
     /**
@@ -330,7 +334,7 @@ public class JacksonEventBuilderSupportTest {
             .eventBody("Dummy Event Body");
 
 
-        assertEquals(expected, instance.build());
+        assertEquals(expected, instance.build(clientStub));
     }
 
 }
