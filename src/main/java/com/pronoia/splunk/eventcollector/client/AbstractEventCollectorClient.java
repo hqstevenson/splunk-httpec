@@ -471,7 +471,7 @@ public abstract class AbstractEventCollectorClient implements EventCollectorClie
             includedEnvironmentVariables = new TreeMap<>();
         }
         if (environmentVariables != null && !environmentVariables.isEmpty()) {
-            environmentVariables.putAll(environmentVariables);
+            includedEnvironmentVariables.putAll(environmentVariables);
         }
     }
 

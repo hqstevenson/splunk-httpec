@@ -754,7 +754,7 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
             includedEnvironmentVariables = new TreeMap<>();
         }
         if (environmentVariables != null && !environmentVariables.isEmpty()) {
-            environmentVariables.putAll(environmentVariables);
+            includedEnvironmentVariables.putAll(environmentVariables);
         }
     }
 
@@ -1104,6 +1104,8 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
                             systemPropertyEntry.setValue(systemPropertyName);
                         }
                         target.put(splunkFieldName, systemPropertyValue);
+                    } else {
+                        log.warn("System property {} not found - ignoring", systemPropertyName);
                     }
                 }
             }
@@ -1167,6 +1169,8 @@ public abstract class EventBuilderSupport<E> implements EventBuilder<E> {
                                 environmentVariableEntry.setValue(environmentVariableName);
                             }
                             target.put(splunkFieldName, environmentVariableValue);
+                        } else {
+                            log.warn("Environment variable {} not found - ignoring", environmentVariableName);
                         }
                     }
                 }
