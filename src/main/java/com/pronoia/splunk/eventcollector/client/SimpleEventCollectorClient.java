@@ -17,6 +17,7 @@
 package com.pronoia.splunk.eventcollector.client;
 
 import com.pronoia.splunk.eventcollector.EventDeliveryException;
+import com.pronoia.splunk.eventcollector.EventDeliveryHttpException;
 
 import java.io.IOException;
 
@@ -39,6 +40,7 @@ import javax.management.ObjectName;
 import javax.net.ssl.SSLContext;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
@@ -197,21 +199,14 @@ public class SimpleEventCollectorClient extends AbstractEventCollectorClient imp
         httpPost.setEntity(new StringEntity(event, ContentType.APPLICATION_JSON));
         try {
             response = httpClient.execute(httpPost);
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-            }
-            if (response.getStatusLine().getStatusCode() == 200) {
-                if (entity != null) {
-                    EntityUtils.consume(entity);
-                }
-            } else {
-                String responseBody = "<empty>";
-                if (entity != null) {
-                    responseBody = EntityUtils.toString(entity);
-                }
-                final String message = String.format("Post failed with response %s - %s for payload %s", response, responseBody, event);
-                log.error(message);
-                throw new EventDeliveryException(event, message);
+            StatusLine statusLine = response.getStatusLine();
+
+            if (statusLine.getStatusCode() != 200) {
+                HttpEntity responseEntity = response.getEntity();
+
+                String responseBody = (responseEntity == null ? "<empty>" : EntityUtils.toString(responseEntity));
+                log.error("Post failed with response {} - {} for payload {}", responseBody, response, event);
+                throw new EventDeliveryHttpException(event, response, responseBody);
             }
             lastEventTime = new Date();
             ++eventCount;
@@ -220,9 +215,14 @@ public class SimpleEventCollectorClient extends AbstractEventCollectorClient imp
         } finally {
             if (response != null) {
                 try {
+                    EntityUtils.consume(response.getEntity());
+                } catch (IOException consumeEx) {
+                    log.warn("Ignoring exception encountered consuming HTTP response entity", consumeEx);
+                }
+                try {
                     response.close();
                 } catch (IOException closeEx) {
-                    log.warn("Exception encountered closing HTTP response", closeEx);
+                    log.warn("Ignoring exception encountered closing HTTP response", closeEx);
                 }
             }
         }

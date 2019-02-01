@@ -16,6 +16,10 @@
  */
 package com.pronoia.splunk.itest.eventcollector.client;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 
 import com.pronoia.splunk.eventcollector.client.SimpleEventCollectorClient;
@@ -37,8 +41,10 @@ public class SimpleEventCollectorClientIT {
 
         // Local Settings
         genericClient.setHost("localhost");
-        genericClient.setPort(8088);
-        genericClient.setAuthorizationToken("9952fa62-cef3-4509-badc-94a8f191dcb1");
+        genericClient.setPort(18088);
+//        genericClient.setAuthorizationToken("9952fa62-cef3-4509-badc-94a8f191dcb1");
+        genericClient.setAuthorizationToken("5DA702AD-D855-4679-9CDE-A398494BE854");
+        genericClient.setUseSSL(false);
         genericClient.disableCertificateValidation();
     }
 
@@ -58,8 +64,10 @@ public class SimpleEventCollectorClientIT {
     public void testPostPayload() throws Exception {
         JSONObject payloadBuilder = new JSONObject();
 
-        payloadBuilder.put("index", "fuse-dev");
-        payloadBuilder.put("event", "Hello");
+//        payloadBuilder.put("index", "fuse-dev");
+        payloadBuilder.put("index", "talend-jms");
+//        payloadBuilder.put("event", "Hello");
+        payloadBuilder.put("event", loadFile());
 
         String payload = payloadBuilder.toJSONString();
 
@@ -113,4 +121,9 @@ public class SimpleEventCollectorClientIT {
       "event": "TEST MESSAGE"
     }
     */
+
+    String loadFile() throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get("src/test/data/data.xml"));
+        return new String(encoded);
+    }
 }
